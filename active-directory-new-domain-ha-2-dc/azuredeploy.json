@@ -6,25 +6,29 @@
             "type": "string",
             "metadata": {
                 "description": "The name of the Administrator of the new VM and Domain"
-            }
+            },
+            "defaultValue": "admin"
         },
         "adminPassword": {
             "type": "securestring",
             "metadata": {
                 "description": "The password for the Administrator account of the new VM and Domain"
-            }
+            },
+            "defaultValue": "Admin123456789"
         },
         "domainName": {
             "type": "string",
             "metadata": {
                 "description": "The FQDN of the AD Domain created "
-            }
+            },
+            "defaultValue": "testdomain.local"
         },
         "dnsPrefix": {
             "type": "string",
             "metadata": {
                 "description": "The DNS prefix for the public IP address used by the Load Balancer"
-            }
+            },
+            "defaultValue": "testdomain"
         },
         "pdcRDPPort": {
             "type": "int",
@@ -645,6 +649,9 @@
             "apiVersion": "2016-05-15",
             "name": "[concat('shutdown-computevm-', variables('adPDCVMName'))]",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('adPDCVMName'))]"
+            ],
             "properties": {
                 "status": "[parameters('shutdown-status')]",
                 "taskType": "ComputeVmShutdownTask",
@@ -664,6 +671,9 @@
             "apiVersion": "2016-05-15",
             "name": "[concat('shutdown-computevm-', variables('adBDCVMName'))]",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('adBDCVMName'))]"
+            ],            
             "properties": {
                 "status": "[parameters('shutdown-status')]",
                 "taskType": "ComputeVmShutdownTask",
