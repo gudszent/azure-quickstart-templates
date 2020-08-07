@@ -67,7 +67,23 @@
             "metadata": {
                 "description": "Size for the VM.  This sample uses premium disk and requires an 'S' sku."
             }
+        },
+        "shutdown-status": {
+            "type": "string",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ]
+        },
+        "shutdownHour": {
+            "type": "string",
+            "defaultValue": "1700"
+        },
+        "shutdown-timeZone": {
+            "type": "string",
+            "defaultValue": "W. Europe Standard Time"
         }
+        
     },
     "variables": {
         "storageAccountType": "Premium_LRS",
@@ -106,7 +122,8 @@
         "adBDCPreparationModulesURL": "[uri(parameters('_artifactsLocation'), concat('DSC/PrepareADBDC.zip', parameters('_artifactsLocationSasToken')))]",
         "adBDCPreparationFunction": "PrepareADBDC.ps1\\PrepareADBDC",
         "adBDCConfigurationModulesURL": "[uri(parameters('_artifactsLocation'), concat('DSC/ConfigureADBDC.zip', parameters('_artifactsLocationSasToken')))]",
-        "adBDCConfigurationFunction": "ConfigureADBDC.ps1\\ConfigureADBDC"
+        "adBDCConfigurationFunction": "ConfigureADBDC.ps1\\ConfigureADBDC",
+        "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]"
     },
     "resources": [
         {
@@ -621,6 +638,44 @@
                         ]
                     }
                 }
+            }
+        },        
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "name": "[concat('shutdown-computevm-', variables('adPDCVMName'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "status": "[parameters('shutdown-status')]",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "[variables('shutdownHour')]"
+                },
+                "timeZoneId": "[parameters('shutdown-timeZone')]",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 30
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('adPDCVMName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "name": "[concat('shutdown-computevm-', variables('adBDCVMName'))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "status": "[parameters('shutdown-status')]",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "[variables('shutdownHour')]"
+                },
+                "timeZoneId": "[parameters('shutdown-timeZone')]",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 30
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('adBDCVMName'))]"
             }
         }
     ]
