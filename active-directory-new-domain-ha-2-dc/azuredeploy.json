@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The name of the Administrator of the new VM and Domain"
             },
-            "defaultValue": "admin"
+            "defaultValue": "adminka"
         },
         "adminPassword": {
             "type": "securestring",
@@ -77,7 +77,8 @@
             "allowedValues": [
                 "Enabled",
                 "Disabled"
-            ]
+            ],
+            "defaultValue": "Enabled"
         },
         "shutdownHour": {
             "type": "string",
