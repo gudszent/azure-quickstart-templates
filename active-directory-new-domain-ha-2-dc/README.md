@@ -1,5 +1,7 @@
 # Create 2 Windows VMs, a new AD Forest, Domain and 2 DCs in an availability set
 
+Added Auto-shutdown!
+
 ![Azure Public Test Date](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain-ha-2-dc/PublicLastTestDate.svg)
 ![Azure Public Test Result](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain-ha-2-dc/PublicDeployment.svg)
 
