@@ -247,7 +247,7 @@
           "Password": "[parameters('domainPassword')]"
         }
       }
-    },        
+    },
         {
             "type": "Microsoft.DevTestLab/schedules",
             "apiVersion": "2016-05-15",
@@ -255,7 +255,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('dnsLabelPrefix'))]"
-            ],
+            ],            
             "properties": {
                 "status": "[parameters('shutdown-status')]",
                 "taskType": "ComputeVmShutdownTask",
