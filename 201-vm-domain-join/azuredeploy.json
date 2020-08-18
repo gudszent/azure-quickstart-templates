@@ -78,22 +78,22 @@
         "description": "Location for all resources."
       }
     },
-        "shutdown-status": {
-            "type": "string",
-            "allowedValues": [
-                "Enabled",
-                "Disabled"
-            ],
-            "defaultValue": "Enabled"
-        },
-        "shutdownHour": {
-            "type": "string",
-            "defaultValue": "1700"
-        },
-        "shutdown-timeZone": {
-            "type": "string",
-            "defaultValue": "W. Europe Standard Time"
-        }
+    "shutdown-status": {
+      "type": "string",
+      "allowedValues": [
+               "Enabled",
+               "Disabled"
+              ],
+      "defaultValue": "Enabled"
+      },
+    "shutdownHour": {
+      "type": "string",
+      "defaultValue": "1700"
+      },
+    "shutdown-timeZone": {
+      "type": "string",
+      "defaultValue": "W. Europe Standard Time"
+      }
   },
   "variables": {
     "storageAccountName": "[concat(uniquestring(resourceGroup().id, deployment().name))]",
