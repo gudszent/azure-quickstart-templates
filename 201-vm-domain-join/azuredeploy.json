@@ -78,22 +78,22 @@
         "description": "Location for all resources."
       }
     },
-    "shutdown-status": {
-      "type": "string",
-      "allowedValues": [
-               "Enabled",
-               "Disabled"
-              ],
-      "defaultValue": "Enabled"
-      },
-    "shutdownHour": {
-      "type": "string",
-      "defaultValue": "1700"
-      },
-    "shutdown-timeZone": {
-      "type": "string",
-      "defaultValue": "W. Europe Standard Time"
-      }
+        "shutdown-status": {
+            "type": "string",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "defaultValue": "Enabled"
+        },
+        "shutdownHour": {
+            "type": "string",
+            "defaultValue": "1700"
+        },
+        "shutdown-timeZone": {
+            "type": "string",
+            "defaultValue": "W. Europe Standard Time"
+        }
   },
   "variables": {
     "storageAccountName": "[concat(uniquestring(resourceGroup().id, deployment().name))]",
@@ -204,22 +204,6 @@
             "enabled": true,
             "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2015-06-15').primaryEndpoints.blob]"
           }
-        },
-        "shutdown-status": {
-            "type": "string",
-            "allowedValues": [
-                "Enabled",
-                "Disabled"
-            ],
-            "defaultValue": "Enabled"
-        },
-        "shutdownHour": {
-            "type": "string",
-            "defaultValue": "1700"
-        },
-        "shutdown-timeZone": {
-            "type": "string",
-            "defaultValue": "W. Europe Standard Time"
         }
       }
     },
@@ -247,6 +231,28 @@
           "Password": "[parameters('domainPassword')]"
         }
       }
-    }
+    },        
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "name": "[concat('shutdown-computevm-', parameters('dnsLabelPrefix'))]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('dnsLabelPrefix'))]"
+            ],
+            "properties": {
+                "status": "[parameters('shutdown-status')]",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "[variables('shutdownHour')]"
+                },
+                "timeZoneId": "[parameters('shutdown-timeZone')]",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 30
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('dnsLabelPrefix'))]"
+            }
+        }
   ]
 }
