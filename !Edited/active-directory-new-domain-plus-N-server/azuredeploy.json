@@ -118,13 +118,6 @@
                 "description": "Subnet IP range."
             }
         },
-        "availabilitySetName": {
-            "type": "string",
-            "defaultValue": "adAvailabiltySet",
-            "metadata": {
-                "description": "Availability set name."
-            }
-        },
         "numberOfInstances": {
             "type": "int",
             "defaultValue": 2,
@@ -175,19 +168,6 @@
             }
         },
         {
-            "type": "Microsoft.Compute/availabilitySets",
-            "apiVersion": "2019-03-01",
-            "location": "[parameters('location')]",
-            "name": "[parameters('availabilitySetName')]",
-            "properties": {
-                "PlatformUpdateDomainCount": 20,
-                "PlatformFaultDomainCount": 2
-            },
-            "sku": {
-                "name": "Aligned"
-            }
-        },
-        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2018-11-01",
             "name": "VNet",
@@ -222,15 +202,11 @@
             "name": "[parameters('virtualMachineName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[parameters('networkInterfaceName')]",
-                "[parameters('availabilitySetName')]"
+                "[parameters('networkInterfaceName')]"
             ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('ADvmSize')]"
-                },
-                "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachineName')]",
