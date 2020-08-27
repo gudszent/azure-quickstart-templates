@@ -16,18 +16,12 @@
         },
         "domainName": {
             "type": "string",
+            "defaultValue": "corp.mydomain.com",
             "metadata": {
                 "description": "The FQDN of the Active Directory Domain to be created"
             }
         },
         "advmSize": {
-            "type": "string",
-            "defaultValue": "Standard_D2s_v3",
-            "metadata": {
-                "description": "Size of the ADVM for the controller"
-            }
-        },
-        "vmSize": {
             "type": "string",
             "defaultValue": "Standard_D2s_v3",
             "metadata": {
@@ -57,7 +51,7 @@
         },
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "VMName",
+            "defaultValue": "adVM",
             "metadata": {
                 "description": "Virtual machine name."
             }
@@ -74,20 +68,6 @@
             "defaultValue": "10.0.0.0/16",
             "metadata": {
                 "description": "Virtual network address range."
-            }
-        },
-        "inboundNatRulesName": {
-            "type": "string",
-            "defaultValue": "adRDP",
-            "metadata": {
-                "description": "Inbound NAT rules name."
-            }
-        },
-        "networkInterfaceName": {
-            "type": "string",
-            "defaultValue": "adNic",
-            "metadata": {
-                "description": "Network interface name."
             }
         },
         "privateIPAddress": {
@@ -111,60 +91,22 @@
                 "description": "Subnet IP range."
             }
         },
-        "publicIPAddressName": {
+        "adnetworkInterfaceName": {
             "type": "string",
-            "defaultValue": "adPublicIP",
+            "defaultValue": "adNic",
             "metadata": {
-                "description": "Subnet IP range."
-            }
-        },
-        "numberOfInstances": {
-            "type": "int",
-            "defaultValue": 2,
-            "minValue": 1,
-            "maxValue": 5,
-            "metadata": {
-                "description": "Number of VMs to deploy, limit 5 since this sample is using a single storage account"
-            }
-        },
-        "OS": {
-            "type": "string",
-            "defaultValue": "Windows 2019",
-            "allowedValues": [
-                "Windows 2016",
-                "Windows 2019"
-            ],
-            "metadata": {
-                "description": "OS Platform for the VM"
+                "description": "Network interface name."
             }
         }
-    },
-    "variables": {
-        "Windows 2016": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "2016-Datacenter",
-            "version": "latest"
-        },
-        "Windows 2019": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "2019-Datacenter",
-            "version": "latest"
-        },
-        "imageReference": "[variables(parameters('OS'))]"
     },
     "resources": [
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
-            "name": "[parameters('publicIPAddressName')]",
+            "name": "adpublicIP",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIPAllocationMethod": "Static" //,
-                //"dnsSettings": {
-                //    "domainNameLabel": "[parameters('dnsPrefix')]"
-                //}
+                "publicIPAllocationMethod": "Static"
             }
         },
         {
@@ -197,16 +139,39 @@
             }
         },
         {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-02-01",
+            "name": "[parameters('adnetworkInterfaceName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "VNet"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('privateIPAddress')]",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
             "name": "[parameters('virtualMachineName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[parameters('networkInterfaceName')]"
+                "[parameters('adnetworkInterfaceName')]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('ADvmSize')]"
+                    "vmSize": "[parameters('advmSize')]"
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachineName')]",
@@ -214,9 +179,19 @@
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
-                    "imageReference": "[variables('imageReference')]",
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
                     "osDisk": {
-                        "createOption": "FromImage"
+                        "name": "[concat(parameters('virtualMachineName'),'_OSDisk')]",
+                        "caching": "ReadOnly",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
                     },
                     "dataDisks": [
                         {
@@ -234,7 +209,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('adnetworkInterfaceName'))]"
                         }
                     ]
                 }
@@ -307,69 +282,6 @@
                     "location": {
                         "value": "[parameters('location')]"
                     }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat('nic', copyindex())]",
-            "apiVersion": "2016-03-30",
-            "location": "[parameters('location')]",
-            "copy": {
-                "name": "nicLoop",
-                "count": "[parameters('numberOfInstances')]"
-            },
-            "dependsOn": [
-                "[parameters('virtualNetworkName')]",
-                "CreateADForest"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat('myvm', copyIndex())]",
-            "apiVersion": "2016-04-30-preview",
-            "location": "[parameters('location')]",
-            "copy": {
-                "name": "virtualMachineLoop",
-                "count": "[parameters('numberOfInstances')]"
-            },
-            "dependsOn": [
-                "nicLoop"
-            ],
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[concat('vm', copyIndex())]",
-                    "adminUsername": "[parameters('adminPassword')]",
-                    "adminPassword": "[parameters('adminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": "[variables('imageReference')]",
-                    "osDisk": {
-                        "createOption": "FromImage"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
-                        }
-                    ]
                 }
             }
         }
