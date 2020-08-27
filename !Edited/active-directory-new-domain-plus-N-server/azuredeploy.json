@@ -25,7 +25,14 @@
             "type": "string",
             "defaultValue": "Standard_D2s_v3",
             "metadata": {
-                "description": "Size of the VM for the controller"
+                "description": "Size of the ADVM for the controller"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D1_v2",
+            "metadata": {
+                "description": "Size of the VM"
             }
         },
         "_artifactsLocation": {
@@ -117,6 +124,29 @@
             "metadata": {
                 "description": "OS Platform for the VM"
             }
+        },
+        "ouPath": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Specifies an organizational unit (OU) for the domain account. Enter the full distinguished name of the OU in quotation marks. Example: \"OU=testOU; DC=domain; DC=Domain; DC=com\""
+            }
+        },
+        "shutdown-status": {
+            "type": "string",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "defaultValue": "Enabled"
+        },
+        "shutdownHour": {
+            "type": "string",
+            "defaultValue": "1700"
+        },
+        "shutdown-timeZone": {
+            "type": "string",
+            "defaultValue": "W. Europe Standard Time"
         }
     },
     "variables": {
@@ -330,7 +360,8 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "VNet"
+                "VNet",
+                "UpdateVNetDNS"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -348,7 +379,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat('myvm', copyIndex())]",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex())]",
             "apiVersion": "2016-04-30-preview",
             "location": "[parameters('location')]",
             "copy": {
@@ -360,10 +391,10 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_D1_v2"
+                    "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat('vm', copyIndex())]",
+                    "computerName": "[concat(parameters('virtualMachineName'),'-', copyIndex())]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
