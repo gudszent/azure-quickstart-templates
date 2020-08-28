@@ -347,6 +347,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
+                 "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
                 "VNet"
             ],
             "properties": {
