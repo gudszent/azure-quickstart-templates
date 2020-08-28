@@ -58,7 +58,7 @@
         },
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "adVM",
+            "defaultValue": "VM",
             "metadata": {
                 "description": "Virtual machine name."
             }
@@ -86,7 +86,7 @@
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "adSubnet",
+            "defaultValue": "Subnet",
             "metadata": {
                 "description": "Subnet name."
             }
@@ -162,13 +162,14 @@
             "sku": "2019-Datacenter",
             "version": "latest"
         },
-        "imageReference": "[variables(parameters('OS'))]"
+        "imageReference": "[variables(parameters('OS'))]",
+        "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]"
     },
     "resources": [
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
-            "name": "adpublicIP",
+            "name": "[concat('AD-',parameters('virtualMachineName'),'publicIP')]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Static"
@@ -206,7 +207,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-02-01",
-            "name": "[parameters('adnetworkInterfaceName')]",
+            "name": "[concat('AD-',parameters('virtualMachineName'),'-nic')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "VNet"
@@ -274,7 +275,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('adnetworkInterfaceName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('AD-',parameters('virtualMachineName'),'-nic'))]"
                         }
                     ]
                 }
@@ -352,7 +353,7 @@
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat('nic', copyindex())]",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-nic')]",
             "apiVersion": "2016-03-30",
             "location": "[parameters('location')]",
             "copy": {
@@ -406,7 +407,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('virtualMachineName'),'-', copyIndex(),'-nic'))]"
                         }
                     ]
                 }
@@ -441,6 +442,28 @@
                 "protectedSettings": {
                     "Password": "[parameters('adminPassword')]"
                 }
+            }
+        },
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "name": "[concat('shutdown-computevm-',parameters('virtualMachineName'),'-')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "virtualMachineDomainjoinLoop"
+            ],            
+            "properties": {
+                "status": "[parameters('shutdown-status')]",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "[variables('shutdownHour')]"
+                },
+                "timeZoneId": "[parameters('shutdown-timeZone')]",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 30
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-', copyIndex()))]"
             }
         }
     ]
