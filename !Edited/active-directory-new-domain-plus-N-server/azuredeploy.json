@@ -415,7 +415,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('virtualMachineName'), padLeft(copyIndex(0),3, '0'), '-vm/JoinDomain')]",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(), '/JoinDomain')]",
             "location": "[parameters('location')]",
             "copy": {
                 "name": "virtualMachineDomainjoinLoop",
