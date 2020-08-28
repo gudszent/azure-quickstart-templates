@@ -162,7 +162,7 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
-            "name": "[concat('AD-',parameters('virtualMachineName'),'publicIP')]",
+            "name": "[concat(parameters('virtualMachineName'),'-AD','-publicIP')]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Static"
@@ -200,7 +200,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-02-01",
-            "name": "[concat('AD-',parameters('virtualMachineName'),'-nic')]",
+            "name": "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "VNet"
@@ -223,10 +223,10 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
-            "name": "[concat('AD-',parameters('virtualMachineName'))]",
+            "name": "[concat(parameters('virtualMachineName'),'-AD')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('AD-',parameters('virtualMachineName'),'-nic')]"
+                "[concat(parameters('virtualMachineName'),'-AD','-nic')]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -268,7 +268,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('AD-',parameters('virtualMachineName'),'-nic'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('virtualMachineName'),'-AD','-nic'))]"
                         }
                     ]
                 }
@@ -280,7 +280,7 @@
                     "name": "CreateADForest",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[concat('AD-',parameters('virtualMachineName'))]"
+                        "[concat(parameters('virtualMachineName'),'-AD')]"
                     ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",
