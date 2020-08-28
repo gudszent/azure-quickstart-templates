@@ -162,6 +162,15 @@
             }
         },
         {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[concat(parameters('virtualMachineName'),'-publicIP')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "VNet",
@@ -384,6 +393,9 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-publicIP'))]"
                             }
                         }
                     }
