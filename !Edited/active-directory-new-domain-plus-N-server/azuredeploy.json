@@ -164,8 +164,12 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
-            "name": "[concat(parameters('virtualMachineName'),'-publicIP')]",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]",
             "location": "[parameters('location')]",
+            "copy": {
+                "name": "publicipLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "properties": {
                 "publicIPAllocationMethod": "Static"
             }
@@ -383,7 +387,7 @@
             },
             "dependsOn": [
                 "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
-                "[concat(parameters('virtualMachineName'),'-publicIP')]",
+                "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]",
                 "VNet"
             ],
             "properties": {
@@ -396,7 +400,7 @@
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
                             },
                             "publicIpAddress": {
-                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-publicIP'))]"
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP'))]"
                             }
                         }
                     }
