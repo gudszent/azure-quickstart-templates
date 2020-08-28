@@ -380,6 +380,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
+                "UpdateVNetDNS",
                 "nicLoop"
             ],
             "properties": {
