@@ -98,7 +98,6 @@
                 "description": "Subnet IP range."
             }
         },
-
         "numberOfInstances": {
             "type": "int",
             "defaultValue": 2,
