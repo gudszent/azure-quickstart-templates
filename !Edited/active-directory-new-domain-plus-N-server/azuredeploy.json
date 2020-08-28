@@ -63,13 +63,6 @@
                 "description": "Virtual machine name."
             }
         },
-        "virtualNetworkName": {
-            "type": "string",
-            "defaultValue": "VMVNET",
-            "metadata": {
-                "description": "Virtual network name."
-            }
-        },
         "virtualNetworkAddressRange": {
             "type": "string",
             "defaultValue": "10.0.0.0/16",
@@ -180,7 +173,7 @@
                 },
                 "parameters": {
                     "virtualNetworkName": {
-                        "value": "[parameters('virtualNetworkName')]"
+                        "value": "[concat(parameters('virtualMachineName'),'-NET')]"
                     },
                     "virtualNetworkAddressRange": {
                         "value": "[parameters('virtualNetworkAddressRange')]"
@@ -213,7 +206,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('privateIPAddress')]",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
                             }
                         }
                     }
@@ -322,7 +315,7 @@
                 },
                 "parameters": {
                     "virtualNetworkName": {
-                        "value": "[parameters('virtualNetworkName')]"
+                        "value": "[concat(parameters('virtualMachineName'),'-NET')]"
                     },
                     "virtualNetworkAddressRange": {
                         "value": "[parameters('virtualNetworkAddressRange')]"
@@ -363,7 +356,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
                             }
                         }
                     }
