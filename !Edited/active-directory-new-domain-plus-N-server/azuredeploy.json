@@ -240,7 +240,7 @@
                         },
                         "privateIPAllocationMethod": "Dynamic",
                         "publicIpAddress": {
-                            "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-AD','-publicIP'))]"
+                            "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-AD','-publicIP'))]"
                         }
                     }
                 ]
