@@ -383,6 +383,7 @@
             },
             "dependsOn": [
                 "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
+                "[concat(parameters('virtualMachineName'),'-publicIP')]",
                 "VNet"
             ],
             "properties": {
