@@ -159,6 +159,9 @@
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Static"
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -191,6 +194,32 @@
             }
         },
         {
+            "name": "[concat(parameters('virtualMachineName'),'-NSG')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-3389",
+                        "properties": {
+                            "priority": 1000,
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "destinationPortRange": "3389",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
+            }
+        },
+        {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-02-01",
             "name": "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
@@ -208,9 +237,16 @@
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
                             }
+                        },
+                        "privateIPAllocationMethod": "Dynamic",
+                        "publicIpAddress": {
+                            "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-AD','-publicIP'))]"
                         }
                     }
                 ]
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -264,6 +300,9 @@
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('virtualMachineName'),'-AD','-nic'))]"
                         }
                     ]
+                },
+                "tags": {
+                    "Csoport": "[parameters('virtualMachineName')]"
                 }
             },
             "resources": [
@@ -335,6 +374,9 @@
                         "value": "[parameters('location')]"
                     }
                 }
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -347,7 +389,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                 "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
+                "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
                 "VNet"
             ],
             "properties": {
@@ -362,6 +404,9 @@
                         }
                     }
                 ]
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -399,6 +444,9 @@
                         }
                     ]
                 }
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -430,28 +478,9 @@
                 "protectedSettings": {
                     "Password": "[parameters('adminPassword')]"
                 }
-            }
-        },
-        {
-            "type": "Microsoft.DevTestLab/schedules",
-            "apiVersion": "2016-05-15",
-            "name": "[concat('shutdown-computevm-',parameters('virtualMachineName'),'-')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "virtualMachineDomainjoinLoop"
-            ],
-            "properties": {
-                "status": "[parameters('shutdown-status')]",
-                "taskType": "ComputeVmShutdownTask",
-                "dailyRecurrence": {
-                    "time": "[variables('shutdownHour')]"
-                },
-                "timeZoneId": "[parameters('shutdown-timeZone')]",
-                "notificationSettings": {
-                    "status": "Disabled",
-                    "timeInMinutes": 30
-                },
-                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-', copyIndex()))]"
+            },
+            "tags": {
+                "Csoport": "[parameters('virtualMachineName')]"
             }
         }
     ]
