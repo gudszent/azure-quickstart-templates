@@ -469,28 +469,6 @@
                     "Password": "[parameters('adminPassword')]"
                 }
             }
-        },
-        {
-            "type": "Microsoft.DevTestLab/schedules",
-            "apiVersion": "2018-09-15",
-            "name": "[concat('shutdown-computevm-',parameters('virtualMachineName'))]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "virtualMachineDomainjoinLoop"
-            ],
-            "properties": {
-                "status": "[parameters('shutdown-status')]",
-                "taskType": "ComputeVmShutdownTask",
-                "dailyRecurrence": {
-                    "time": "[variables('shutdownHour')]"
-                },
-                "timeZoneId": "[parameters('shutdown-timeZone')]",
-                "notificationSettings": {
-                    "status": "Disabled",
-                    "timeInMinutes": 30
-                },
-                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('virtualMachineName'),copyIndex(parameters('numberOfInstances'))))]"
-            }
         }
     ]
 }
