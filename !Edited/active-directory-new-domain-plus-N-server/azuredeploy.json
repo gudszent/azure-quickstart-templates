@@ -159,9 +159,6 @@
             "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "Static"
-            },
-            "tags": {
-                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -214,9 +211,6 @@
                         }
                     }
                 ]
-            },
-            "tags": {
-                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -243,9 +237,6 @@
                         }
                     }
                 ]
-            },
-            "tags": {
-                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -397,9 +388,6 @@
                         }
                     }
                 ]
-            },
-            "tags": {
-                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -437,9 +425,6 @@
                         }
                     ]
                 }
-            },
-            "tags": {
-                "Csoport": "[parameters('virtualMachineName')]"
             }
         },
         {
@@ -471,9 +456,28 @@
                 "protectedSettings": {
                     "Password": "[parameters('adminPassword')]"
                 }
-            },
-            "tags": {
-                "Csoport": "[parameters('virtualMachineName')]"
+            }
+        },
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "name": "[concat('shutdown-computevm-',parameters('virtualMachineName'),'-')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "virtualMachineDomainjoinLoop"
+            ],
+            "properties": {
+                "status": "[parameters('shutdown-status')]",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "[variables('shutdownHour')]"
+                },
+                "timeZoneId": "[parameters('shutdown-timeZone')]",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 30
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-', copyIndex()))]"
             }
         }
     ]
