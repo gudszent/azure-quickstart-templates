@@ -229,7 +229,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
-            "name": "[parameters('virtualMachineName')]",
+            "name": "[concat('AD-',parameters('virtualMachineName'))]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[parameters('adnetworkInterfaceName')]"
@@ -286,7 +286,7 @@
                     "name": "CreateADForest",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[parameters('virtualMachineName')]"
+                        "[concat('AD-',parameters('virtualMachineName'))]"
                     ],
                     "properties": {
                         "publisher": "Microsoft.Powershell",
@@ -360,8 +360,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "VNet",
-                "UpdateVNetDNS"
+                "VNet"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -424,7 +423,8 @@
             },
             "dependsOn": [
                 "virtualMachineLoop",
-                "UpdateVNetDNS"
+                "UpdateVNetDNS",
+                "VNet"
             ],
             "properties": {
                 "publisher": "Microsoft.Compute",
