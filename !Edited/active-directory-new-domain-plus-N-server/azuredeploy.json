@@ -236,11 +236,10 @@
                             "privateIPAddress": "[parameters('privateIPAddress')]",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-AD','-publicIP'))]"
                             }
-                        },
-                        "privateIPAllocationMethod": "Dynamic",
-                        "publicIpAddress": {
-                            "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-AD','-publicIP'))]"
                         }
                     }
                 ]
