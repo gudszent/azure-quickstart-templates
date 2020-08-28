@@ -98,13 +98,7 @@
                 "description": "Subnet IP range."
             }
         },
-        "adnetworkInterfaceName": {
-            "type": "string",
-            "defaultValue": "adNic",
-            "metadata": {
-                "description": "Network interface name."
-            }
-        },
+
         "numberOfInstances": {
             "type": "int",
             "defaultValue": 2,
@@ -233,7 +227,7 @@
             "name": "[concat('AD-',parameters('virtualMachineName'))]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[parameters('adnetworkInterfaceName')]"
+                "[concat('AD-',parameters('virtualMachineName'),'-nic')]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -451,7 +445,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "virtualMachineDomainjoinLoop"
-            ],            
+            ],
             "properties": {
                 "status": "[parameters('shutdown-status')]",
                 "taskType": "ComputeVmShutdownTask",
