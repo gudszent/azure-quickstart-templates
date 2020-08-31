@@ -294,7 +294,7 @@
                     "dataDisks": [
                         {
                             "name": "[concat(parameters('virtualMachineName'), '_DataDisk')]",
-                            "diskSizeGB": 1023,
+                            "diskSizeGB": 10,
                             "lun": 0,
                             "vhd": {
                                 "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-datadisk.vhd'))]"
