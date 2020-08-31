@@ -270,7 +270,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
-                "[concat(parameters('virtualMachineName'),'-storageaccount')]"
+                "[concat(parameters('virtualMachineName'),'sa')]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -286,7 +286,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('virtualMachineName'),'-AD_OSDisk')]",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'-storageaccount'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-osdisk.vhd'))]"
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-osdisk.vhd'))]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -297,7 +297,7 @@
                             "diskSizeGB": 1023,
                             "lun": 0,
                             "vhd": {
-                                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'-storageaccount'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-datadisk.vhd'))]"
+                                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-datadisk.vhd'))]"
                             },
                             "createOption": "Empty"
                         }
@@ -440,7 +440,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'_OSDisk')]",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'-storageaccount'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd'))]"
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd'))]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
