@@ -156,7 +156,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2018-07-01",
             "name": "[toLower(concat(parameters('virtualMachineName'),'sa'))]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS"
             },
