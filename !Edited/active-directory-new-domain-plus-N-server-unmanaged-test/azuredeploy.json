@@ -264,8 +264,8 @@
             }
         },
         {
-            "type": "Microsoft.DevTestLab/labs/virtualmachines",
-            "apiVersion": "2018-09-15",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
             "name": "[concat(parameters('virtualMachineName'),'-AD')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -300,23 +300,6 @@
                                 "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-datadisk.vhd'))]"
                             },
                             "createOption": "Empty"
-                        }
-                    ],
-                    "scheduleParameters": [
-                        {
-                            "properties": {
-                                "status": "[parameters('shutdown-status')]",
-                                "taskType": "ComputeVmShutdownTask",
-                                "dailyRecurrence": {
-                                    "time": "[variables('shutdownHour')]"
-                                },
-                                "timeZoneId": "[parameters('shutdown-timeZone')]",
-                                "notificationSettings": {
-                                    "status": "Disabled",
-                                    "timeInMinutes": 30
-                                }
-
-                            }
                         }
                     ]
                 },
@@ -358,6 +341,28 @@
                                 "AdminPassword": "[parameters('adminPassword')]"
                             }
                         }
+                    }
+                },
+                {
+                    "type": "Microsoft.DevTestLab/schedules",
+                    "apiVersion": "2016-05-15",
+                    "name": "[concat('shutdown-computevm-', concat(parameters('virtualMachineName'),'-AD'))]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat(parameters('virtualMachineName'),'-AD')]"
+                    ],
+                    "properties": {
+                        "status": "[parameters('shutdown-status')]",
+                        "taskType": "ComputeVmShutdownTask",
+                        "dailyRecurrence": {
+                            "time": "[variables('shutdownHour')]"
+                        },
+                        "timeZoneId": "[parameters('shutdown-timeZone')]",
+                        "notificationSettings": {
+                            "status": "Disabled",
+                            "timeInMinutes": 30
+                        },
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-AD'))]"
                     }
                 }
             ]
