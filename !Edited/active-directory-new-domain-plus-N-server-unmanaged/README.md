@@ -1,13 +1,5 @@
 # Create a new Windows VM and create a new AD Forest, Domain and DC
-
-![Azure Public Test Date](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain/PublicLastTestDate.svg)
-![Azure Public Test Result](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain/PublicDeployment.svg)
-
-![Azure US Gov Last Test Date](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain/FairfaxLastTestDate.svg)
-![Azure US Gov Last Test Result](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain/FairfaxDeployment.svg)
-
-![Best Practice Check](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain/BestPracticeResult.svg)
-![Cred Scan Check](https://azurequickstartsservice.blob.core.windows.net/badges/active-directory-new-domain/CredScanResult.svg)
+## With Schedule!!
 
 This template will deploy a new VM (along with a new VNet and Load Balancer) and will configure it as a Domain Controller and create a new forest and domain.
 
