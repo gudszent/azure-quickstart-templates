@@ -475,7 +475,31 @@
                         }
                     ]
                 }
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.DevTestLab/schedules",
+                    "apiVersion": "2016-05-15",
+                    "name": "[concat('shutdown-computevm-', concat(parameters('virtualMachineName'),'-', copyIndex()))]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat(parameters('virtualMachineName'),'-AD')]"
+                    ],
+                    "properties": {
+                        "status": "[parameters('shutdown-status')]",
+                        "taskType": "ComputeVmShutdownTask",
+                        "dailyRecurrence": {
+                            "time": "[variables('shutdownHour')]"
+                        },
+                        "timeZoneId": "[parameters('shutdown-timeZone')]",
+                        "notificationSettings": {
+                            "status": "Disabled",
+                            "timeInMinutes": 30
+                        },
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-', copyIndex()))]"
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2015-06-15",
