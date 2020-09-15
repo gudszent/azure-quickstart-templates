@@ -1330,15 +1330,5 @@
         }
       }
     }
-  ],
-  "outputs": {
-    "fqdn": {
-      "value": "[variables('sharepointWebfqdn')]",
-      "type": "string"
-    },
-    "cafqdn": {
-      "value": "[variables('sharepointCAfqdn')]",
-      "type": "string"
-    }
-  }
+  ]
 }
