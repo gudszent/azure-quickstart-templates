@@ -35,11 +35,17 @@
         "imageVersion": {
             "type": "string"
         },
+        "shutdown-status": {
+            "type": "string"
+        },
+        "shutdownHour": {
+            "type": "string"
+        },
+        "shutdown-timeZone": {
+            "type": "string"
+        },
         "zones": {
             "type": "array"
-        },
-        "storageContainerUri": {
-            "type": "string"
         },
         "_artifactsLocation": {
             "type": "string"
@@ -75,9 +81,6 @@
                     },
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osdisk')]",
-                        "vhd": {
-                            "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-osdisk.vhd')]"
-                        },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     },
@@ -88,9 +91,6 @@
                             "input": {
                                 "diskSizeGB": "[parameters('vmDiskSize')]",
                                 "lun": "[copyIndex('dataDisks')]",
-                                "vhd": {
-                                     "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-', copyIndex('dataDisks'),'-datadisk.vhd')]"
-                                    },
                                 "createOption": "Empty"
                             }
                         }
@@ -103,7 +103,31 @@
                         }
                     ]
                 }
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.DevTestLab/schedules",
+                    "apiVersion": "2016-05-15",
+                    "name": "[concat('shutdown-computevm-', concat(parameters('vmName'),'-', copyIndex()))]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat(parameters('vmName'),'-', copyIndex())]"
+                    ],
+                    "properties": {
+                        "status": "[parameters('shutdown-status')]",
+                        "taskType": "ComputeVmShutdownTask",
+                        "dailyRecurrence": {
+                            "time": "[parameters('shutdownHour')]"
+                        },
+                        "timeZoneId": "[parameters('shutdown-timeZone')]",
+                        "notificationSettings": {
+                            "status": "Disabled",
+                            "timeInMinutes": 30
+                        },
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('vmName'),'-', copyIndex()))]"
+                    }
+                }
+            ]
         }
     ],
     "outputs": {

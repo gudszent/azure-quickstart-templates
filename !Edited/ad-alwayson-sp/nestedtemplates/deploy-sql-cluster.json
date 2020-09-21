@@ -125,6 +125,15 @@
             "type": "string",
             "defaultValue": "storageaccasfaasc"
         },
+        "shutdown-status": {
+            "type": "string"
+        },
+        "shutdownHour": {
+            "type": "string"
+        },
+        "shutdown-timeZone": {
+            "type": "string"
+        },
         "_artifactsLocation": {
             "type": "string"
         },
@@ -450,6 +459,15 @@
                     },
                     "storageContainerUri": {
                         "value": "[parameters('storageContainerUri')]"
+                    },
+                    "shutdown-status": {
+                        "value": "[parameters('shutdown-status')]"
+                    },
+                    "shutdownHour": {
+                        "value": "[parameters('shutdownHour')]"
+                    },
+                    "shutdown-timeZone": {
+                        "value": "[parameters('shutdown-timeZone')]"
                     },
                     "imageVersion": {
                         "value": "[parameters('imageVersion')]"

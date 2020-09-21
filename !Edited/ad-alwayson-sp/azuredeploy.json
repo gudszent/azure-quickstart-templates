@@ -147,12 +147,12 @@
     },
     "sqlvmDiskSize": {
       "type": "int",
-      "minValue": 128,
+      "minValue": 32,
       "maxValue": 1023,
       "metadata": {
         "description": "Size of each data disk in GB on each SQL Server VM (Min=128, Max=1023)"
       },
-      "defaultValue": 1023
+      "defaultValue": 32
     },
     "sqlvmDiskCount": {
       "type": "int",
@@ -245,7 +245,6 @@
     },
     "imageReference": "[variables(parameters('OS'))]",
     "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]",
-    "storagesa":"[concat(parameters('virtualMachineName'),'sa')]",
     "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]"
   },
   "resources": [
@@ -696,6 +695,15 @@
           },
           "workloadType": {
             "value": "[parameters('workloadType')]"
+          },
+          "shutdown-status": {
+            "value": "[parameters('shutdown-status')]"
+          },
+          "shutdownHour": {
+            "value": "[variables('shutdownHour')]"
+          },
+          "shutdown-timeZone": {
+            "value": "[parameters('shutdown-timeZone')]"
           },
           "storageContainerUri": {
             "value": "[variables('storageContainerUri')]"
