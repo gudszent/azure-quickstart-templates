@@ -76,7 +76,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osdisk')]",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storagesa'),'sa')).primaryEndpoints.blob, concat('vhds/',parameters('vmName'),'-', copyIndex(),'-osdisk.vhd'))]"
+                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storagesa'))).primaryEndpoints.blob, concat('vhds/',parameters('vmName'),'-', copyIndex(),'-osdisk.vhd'))]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -89,7 +89,7 @@
                                 "diskSizeGB": "[parameters('vmDiskSize')]",
                                 "lun": "[copyIndex('dataDisks')]",
                                 "vhd": {
-                                    "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storagesa'),'sa')).primaryEndpoints.blob, concat('vhds/',parameters('vmName'),'-AD','-datadisk.vhd'))]"
+                                    "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storagesa'))).primaryEndpoints.blob, concat('vhds/',parameters('vmName'),'-AD','-datadisk.vhd'))]"
                                 },
                                 "createOption": "Empty"
                             }
