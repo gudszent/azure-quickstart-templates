@@ -645,7 +645,7 @@
             "value": "[parameters('location')]"
           },
           "namePrefix": {
-            "value": "[concat(parameters('virtualMachineName'),'SQL')]"
+            "value": "[concat(parameters('virtualMachineName'),'sql')]"
           },
           "domainName": {
             "value": "[parameters('domainName')]"
