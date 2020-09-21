@@ -147,12 +147,12 @@
     },
     "sqlvmDiskSize": {
       "type": "int",
-      "minValue": 128,
+      "minValue": 32,
       "maxValue": 1023,
       "metadata": {
         "description": "Size of each data disk in GB on each SQL Server VM (Min=128, Max=1023)"
       },
-      "defaultValue": 128
+      "defaultValue": 32
     },
     "sqlvmDiskCount": {
       "type": "int",
