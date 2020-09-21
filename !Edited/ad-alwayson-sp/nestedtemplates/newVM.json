@@ -89,7 +89,7 @@
                                 "diskSizeGB": "[parameters('vmDiskSize')]",
                                 "lun": "[copyIndex('dataDisks')]",
                                 "vhd": {
-                                     "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-', copyIndex(),'-datadisk.vhd')]"
+                                     "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-', copyIndex('dataDisks'),'-datadisk.vhd')]"
                                     },
                                 "createOption": "Empty"
                             }
