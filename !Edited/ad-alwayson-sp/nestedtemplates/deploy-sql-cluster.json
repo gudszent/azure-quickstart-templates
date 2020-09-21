@@ -121,7 +121,7 @@
             "type": "string",
             "defaultValue": "latest"
         },
-        "storagesa": {
+        "storageContainerUri": {
             "type": "string",
             "defaultValue": "storageaccasfaasc"
         },
@@ -448,8 +448,8 @@
                     "imageSKU": {
                         "value": "[parameters('imageSKU')]"
                     },
-                    "storagesa": {
-                        "type": "[parameters('storagesa')]"
+                    "storageContainerUri": {
+                        "type": "[parameters('storageContainerUri')]"
                     },
                     "imageVersion": {
                         "value": "[parameters('imageVersion')]"

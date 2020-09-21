@@ -38,7 +38,7 @@
         "zones": {
             "type": "array"
         },
-        "storagesa": {
+        "storageContainerUri": {
             "type": "string"
         },
         "_artifactsLocation": {
@@ -76,7 +76,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osdisk')]",
                         "vhd": {
-                            "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storagesa'))).primaryEndpoints.blob, concat('vhds/',parameters('vmName'),'-', copyIndex(),'-osdisk.vhd'))]"
+                            "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-osdisk.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -89,8 +89,8 @@
                                 "diskSizeGB": "[parameters('vmDiskSize')]",
                                 "lun": "[copyIndex('dataDisks')]",
                                 "vhd": {
-                                    "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', parameters('storagesa'))).primaryEndpoints.blob, concat('vhds/',parameters('vmName'),'-AD','-datadisk.vhd'))]"
-                                },
+                                     "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-', copyIndex(),'-datadisk.vhd')]"
+                                    },
                                 "createOption": "Empty"
                             }
                         }

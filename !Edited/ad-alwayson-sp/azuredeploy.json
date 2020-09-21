@@ -245,7 +245,8 @@
     },
     "imageReference": "[variables(parameters('OS'))]",
     "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]",
-    "storagesa":"[concat(parameters('virtualMachineName'),'sa')]"
+    "storagesa":"[concat(parameters('virtualMachineName'),'sa')]",
+    "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]"
   },
   "resources": [
     {
@@ -383,7 +384,7 @@
           "osDisk": {
             "name": "[concat(parameters('virtualMachineName'),'-AD_OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-osdisk.vhd'))]"
+              "uri": "[concat(variables('storageContainerUri'), parameters('virtualMachineName'),'-AD','-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -394,7 +395,7 @@
               "diskSizeGB": 10,
               "lun": 0,
               "vhd": {
-                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-AD','-datadisk.vhd'))]"
+                "uri": "[concat(variables('storageContainerUri'), parameters('virtualMachineName'),'-AD','-datadisk.vhd')]"
               },
               "createOption": "Empty"
             }
@@ -560,7 +561,7 @@
           "osDisk": {
             "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'_OSDisk')]",
             "vhd": {
-              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', concat(parameters('virtualMachineName'),'sa'))).primaryEndpoints.blob, concat('vhds/',parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd'))]"
+              "uri": "[concat(variables('storageContainerUri'), parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd')]"
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
@@ -696,8 +697,8 @@
           "workloadType": {
             "value": "[parameters('workloadType')]"
           },
-          "storagesa": {
-            "value": "[variables('storagesa')]"
+          "storageContainerUri": {
+            "value": "[variables('storageContainerUri')]"
           },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
