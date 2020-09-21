@@ -695,6 +695,9 @@
           "workloadType": {
             "value": "[parameters('workloadType')]"
           },
+          "storagesa": {
+            "value": "[concat(parameters('virtualMachineName'),'sa')]"
+          },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
           },

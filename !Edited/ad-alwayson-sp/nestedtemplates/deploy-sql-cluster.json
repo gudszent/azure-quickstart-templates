@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "Location for the VM, only certain regions support zones during preview."
             }
-        },  
+        },
         "namePrefix": {
             "type": "string",
             "minLength": 3,
@@ -121,6 +121,9 @@
             "type": "string",
             "defaultValue": "latest"
         },
+        "storagesa": {
+            "type": "string"
+        },
         "_artifactsLocation": {
             "type": "string"
         },
@@ -167,7 +170,7 @@
         "agProbePort": 59999,
         "snatTcpPort": 59998,
         "snatProbePort": 3389,
-        "zones": ["1","2","3"]
+        "zones": [ "1", "2", "3" ]
     },
     "resources": [
         {
@@ -329,7 +332,7 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[concat(parameters('nicVnetUri'),'/subnets/',parameters('existingSubnetName'))]"
-                            },           
+                            },
                             "primary": true
                         }
                     },
@@ -443,6 +446,9 @@
                     },
                     "imageSKU": {
                         "value": "[parameters('imageSKU')]"
+                    },
+                    "storagesa": {
+                        "type": "string"
                     },
                     "imageVersion": {
                         "value": "[parameters('imageVersion')]"
