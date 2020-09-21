@@ -633,7 +633,10 @@
       "name": "[variables('deploySqlCluster')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
-      "dependsOn": [],
+      "dependsOn": [
+        "UpdateVNetDNS",
+        "nicLoop"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -645,7 +648,7 @@
             "value": "[parameters('location')]"
           },
           "namePrefix": {
-            "value": "[concat(parameters('virtualMachineName'),'sql')]"
+            "value": "[parameters('virtualMachineName')]"
           },
           "domainName": {
             "value": "[parameters('domainName')]"
