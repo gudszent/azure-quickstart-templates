@@ -244,7 +244,8 @@
       "version": "latest"
     },
     "imageReference": "[variables(parameters('OS'))]",
-    "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]"
+    "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]",
+    "storagesa":"[concat(parameters('virtualMachineName'),'sa')]"
   },
   "resources": [
     {
@@ -696,7 +697,7 @@
             "value": "[parameters('workloadType')]"
           },
           "storagesa": {
-            "value": "[concat(parameters('virtualMachineName'),'sa')]"
+            "value": "[variables('storagesa')]"
           },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"

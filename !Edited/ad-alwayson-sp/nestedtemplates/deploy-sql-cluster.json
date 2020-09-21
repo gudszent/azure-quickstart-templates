@@ -122,7 +122,8 @@
             "defaultValue": "latest"
         },
         "storagesa": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "storageaccasfaasc"
         },
         "_artifactsLocation": {
             "type": "string"
