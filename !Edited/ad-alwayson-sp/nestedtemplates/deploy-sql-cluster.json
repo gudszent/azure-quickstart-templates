@@ -449,7 +449,7 @@
                         "value": "[parameters('imageSKU')]"
                     },
                     "storageContainerUri": {
-                        "type": "[parameters('storageContainerUri')]"
+                        "value": "[parameters('storageContainerUri')]"
                     },
                     "imageVersion": {
                         "value": "[parameters('imageVersion')]"
