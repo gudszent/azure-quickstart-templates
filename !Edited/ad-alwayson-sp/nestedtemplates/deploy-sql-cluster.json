@@ -448,7 +448,7 @@
                         "value": "[parameters('imageSKU')]"
                     },
                     "storagesa": {
-                        "type": "string"
+                        "type": "[parameters('storagesa')]"
                     },
                     "imageVersion": {
                         "value": "[parameters('imageVersion')]"
