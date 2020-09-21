@@ -705,9 +705,6 @@
           "shutdown-timeZone": {
             "value": "[parameters('shutdown-timeZone')]"
           },
-          "storageContainerUri": {
-            "value": "[variables('storageContainerUri')]"
-          },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
           },

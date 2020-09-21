@@ -121,10 +121,6 @@
             "type": "string",
             "defaultValue": "latest"
         },
-        "storageContainerUri": {
-            "type": "string",
-            "defaultValue": "storageaccasfaasc"
-        },
         "shutdown-status": {
             "type": "string"
         },
@@ -456,9 +452,6 @@
                     },
                     "imageSKU": {
                         "value": "[parameters('imageSKU')]"
-                    },
-                    "storageContainerUri": {
-                        "value": "[parameters('storageContainerUri')]"
                     },
                     "shutdown-status": {
                         "value": "[parameters('shutdown-status')]"
