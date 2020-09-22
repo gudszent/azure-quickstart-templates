@@ -24,21 +24,24 @@
       "metadata": {
         "group": "Infrastructure settings",
         "description": "The name of the administrator account of the new VMs and Domain"
-      }
+      },
+      "defaultValue": "goadmin"
     },
     "adminPassword": {
       "type": "securestring",
       "metadata": {
         "group": "Infrastructure settings",
         "description": "The password for the administrator account of the new VMs and Domain"
-      }
+      },
+      "defaultValue": "Alap12345678"
     },
     "storageAccountNamePrefix": {
       "type": "string",
       "metadata": {
         "group": "Infrastructure settings",
         "description": "The prefix of the new storage account created to store the VM disks. Different storage accounts will be created for AD, SQL, and SharePoint VMs."
-      }
+      },
+      "defaultValue": "fgszszsa"
     },
     "storageAccountType": {
       "type": "string",
@@ -46,11 +49,11 @@
         "group": "Infrastructure settings",
         "description": "The type of storage account"
       },
-      "defaultValue": "Premium_LRS"
+      "defaultValue": "Standard_LRS"
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "spfarmhaVNET",
+      "defaultValue": "fgszsz-NET",
       "metadata": {
         "group": "Infrastructure settings",
         "description": "Name of virtual network to be created"
@@ -78,7 +81,7 @@
         "group": "Infrastructure settings",
         "description": "Change this value to your repo name if deploying from a fork"
       },
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/sharepoint-server-farm-ha"
+      "defaultValue": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/ad-alwayson-sp/"
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
@@ -95,47 +98,7 @@
         "group": "Active Directory settings",
         "description": "The FQDN of the AD Domain created "
       },
-      "defaultValue": "sphafarm.local"
-    },
-    "adVMSize": {
-      "type": "string",
-      "metadata": {
-        "group": "Active Directory settings",
-        "description": "The size of the AD VMs created"
-      },
-      "defaultValue": "Standard_DS1"
-    },
-    "adPdcNicIPAddress": {
-      "type": "string",
-      "metadata": {
-        "group": "Active Directory settings",
-        "description": "The IP address of the new AD VM"
-      },
-      "defaultValue": "10.0.0.4"
-    },
-    "adBdcNicIPAddress": {
-      "type": "string",
-      "metadata": {
-        "group": "Active Directory settings",
-        "description": "The IP address of the new AD VM"
-      },
-      "defaultValue": "10.0.0.5"
-    },
-    "sqlVMSize": {
-      "type": "string",
-      "metadata": {
-        "group": "SQL Server settings",
-        "description": "The size of the SQL VMs created"
-      },
-      "defaultValue": "Standard_DS3"
-    },
-    "witnessVMSize": {
-      "type": "string",
-      "metadata": {
-        "group": "SQL Server settings",
-        "description": "The size of the witness VM created"
-      },
-      "defaultValue": "Standard_DS1"
+      "defaultValue": "otto.local"
     },
     "sqlServerServiceAccountUserName": {
       "type": "string",
@@ -143,30 +106,15 @@
         "group": "SQL Server settings",
         "description": "The SQL Server service account name"
       },
-      "defaultValue": "sqlservice"
+      "defaultValue": "goadminsql"
     },
     "sqlServerServiceAccountPassword": {
       "type": "securestring",
       "metadata": {
         "group": "SQL Server settings",
         "description": "The SQL Server Service account password"
-      }
-    },
-    "sqlLBIPAddress": {
-      "type": "string",
-      "metadata": {
-        "group": "SQL Server settings",
-        "description": "The IP address of the new SQL ILB"
       },
-      "defaultValue": "10.0.0.6"
-    },
-    "sqlSubnet": {
-      "type": "string",
-      "metadata": {
-        "group": "SQL Server settings",
-        "description": "The address range of the SQL subnet created in the new VNET"
-      },
-      "defaultValue": "10.0.1.0/24"
+      "defaultValue": "Alap12345678"
     },
     "spWebSubnet": {
       "type": "string",
@@ -383,12 +331,6 @@
         "name": "[variables('subnetNames').staticSubnetName]",
         "properties": {
           "addressPrefix": "[parameters('staticSubnet')]"
-        }
-      },
-      {
-        "name": "[variables('subnetNames').sqlSubnetName]",
-        "properties": {
-          "addressPrefix": "[parameters('sqlSubnet')]"
         }
       },
       {
@@ -706,9 +648,6 @@
           },
           "domainName": {
             "value": "[parameters('domainName')]"
-          },
-          "DNSServer": {
-            "value": "[parameters('adPdcNicIPAddress')]"
           }
         }
       }
