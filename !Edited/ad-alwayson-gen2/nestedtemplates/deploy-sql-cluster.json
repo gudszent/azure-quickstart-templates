@@ -91,7 +91,8 @@
             "maxValue": 1023,
             "metadata": {
                 "description": "Size of each data disk in GB on each SQL Server VM (Min=128, Max=1023)"
-            }
+            },
+            "defaultValue": 128
         },
         "vmDiskCount": {
             "type": "int",
@@ -131,7 +132,8 @@
             "type": "string"
         },
         "_artifactsLocation": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/ad-alwayson-sp/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring"

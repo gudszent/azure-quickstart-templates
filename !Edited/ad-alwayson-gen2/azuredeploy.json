@@ -230,6 +230,7 @@
   "variables": {
     "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',concat(parameters('virtualMachineName'),'-NET'))]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
+    "deployDCClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
     "deploySqlCluster": "deploySqlCluster",
     "Windows 2016": {
       "publisher": "MicrosoftWindowsServer",
@@ -245,7 +246,8 @@
     },
     "imageReference": "[variables(parameters('OS'))]",
     "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]",
-    "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]"
+    "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]",
+    "deployDC": "[concat(parameters('virtualMachineName'),'-DeployDC')]"
   },
   "resources": [
     {
@@ -260,31 +262,9 @@
       "properties": {}
     },
     {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "[concat(parameters('virtualMachineName'),'-AD','-publicIP')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIPAllocationMethod": "Static"
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]",
-      "location": "[parameters('location')]",
-      "copy": {
-        "name": "publicipLoop",
-        "count": "[parameters('numberOfInstances')]"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Static"
-      }
-    },
-    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "VNet",
+      "name": "[concat(parameters('virtualMachineName'),'-VNet')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -334,162 +314,82 @@
       }
     },
     {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2019-02-01",
-      "name": "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('deployDC')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
       "dependsOn": [
-        "VNet"
+        "[concat(parameters('virtualMachineName'),'-VNet')]",
+        "[toLower(concat(parameters('virtualMachineName'),'sa'))]"
       ],
       "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[parameters('privateIPAddress')]",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
-              },
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-AD','-publicIP'))]"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2019-03-01",
-      "name": "[concat(parameters('virtualMachineName'),'-AD')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
-        "[concat(parameters('virtualMachineName'),'sa')]"
-      ],
-      "properties": {
-        "licenseType": "Windows_Server",
-        "hardwareProfile": {
-          "vmSize": "[parameters('advmSize')]"
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('deployDCClusterTemplateURL')]",
+          "contentVersion": "1.0.0.0"
         },
-        "osProfile": {
-          "computerName": "[parameters('virtualMachineName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": "[variables('imageReference')]",
-          "osDisk": {
-            "name": "[concat(parameters('virtualMachineName'),'-AD_OSDisk')]",
-            "vhd": {
-              "uri": "[concat(variables('storageContainerUri'), parameters('virtualMachineName'),'-AD','-osdisk.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
           },
-          "dataDisks": [
-            {
-              "name": "[concat(parameters('virtualMachineName'), '_DataDisk')]",
-              "diskSizeGB": 10,
-              "lun": 0,
-              "vhd": {
-                "uri": "[concat(variables('storageContainerUri'), parameters('virtualMachineName'),'-AD','-datadisk.vhd')]"
-              },
-              "createOption": "Empty"
-            }
-          ]
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('virtualMachineName'),'-AD','-nic'))]"
-            }
-          ]
-        }
-      },
-      "resources": [
-        {
-          "type": "extensions",
-          "apiVersion": "2019-03-01",
-          "name": "CreateADForest",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat(parameters('virtualMachineName'),'-AD')]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Powershell",
-            "type": "DSC",
-            "typeHandlerVersion": "2.19",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "ModulesUrl": "[uri(parameters('_artifactsLocation'), concat('dsc/CreateADPDC.zip', parameters('_artifactsLocationSasToken')))]",
-              "ConfigurationFunction": "CreateADPDC.ps1\\CreateADPDC",
-              "Properties": {
-                "DomainName": "[parameters('domainName')]",
-                "AdminCreds": {
-                  "UserName": "[parameters('adminUsername')]",
-                  "Password": "PrivateSettingsRef:AdminPassword"
-                }
-              }
-            },
-            "protectedSettings": {
-              "Items": {
-                "AdminPassword": "[parameters('adminPassword')]"
-              }
-            }
-          }
-        },
-        {
-          "type": "Microsoft.DevTestLab/schedules",
-          "apiVersion": "2016-05-15",
-          "name": "[concat('shutdown-computevm-', concat(parameters('virtualMachineName'),'-AD'))]",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat(parameters('virtualMachineName'),'-AD')]"
-          ],
-          "properties": {
-            "status": "[parameters('shutdown-status')]",
-            "taskType": "ComputeVmShutdownTask",
-            "dailyRecurrence": {
-              "time": "[variables('shutdownHour')]"
-            },
-            "timeZoneId": "[parameters('shutdown-timeZone')]",
-            "notificationSettings": {
-              "status": "Disabled",
-              "timeInMinutes": 30
-            },
-            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-AD'))]"
-          }
-        },
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('virtualMachineName'),'-AD/Antivir')]",
-          "apiVersion": "2019-07-01",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[concat(parameters('virtualMachineName'),'-AD')]"
-          ],
-
-          "properties": {
-            "publisher": "Microsoft.Azure.Security",
-            "type": "IaaSAntimalware",
-            "typeHandlerVersion": "1.3",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "AntimalwareEnabled": "false",
-              "RealtimeProtectionEnabled": "false",
-              "ScheduledScanSettings": {
-                "isEnabled": "false",
-                "scanType": "Quick",
-                "day": "7",
-                "time": "120"
-              }
-            },
-            "protectedSettings": null
+          "virtualMachineName": {
+            "value": "[parameters('virtualMachineName')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "virtualNetworkAddressRange": {
+            "value": "[parameters('virtualNetworkAddressRange')]"
+          },
+          "privateIPAddress": {
+            "value": "[parameters('privateIPAddress')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "subnetRange": {
+            "value": "[parameters('subnetRange')]"
+          },
+          "shutdown-status": {
+            "value": "[parameters('shutdown-status')]"
+          },
+          "shutdownHour": {
+            "value": "[variables('shutdownHour')]"
+          },
+          "shutdown-timeZone": {
+            "value": "[parameters('shutdown-timeZone')]"
+          },
+          "imageReference": {
+            "value": "[variables(parameters('OS'))]"
+          },
+          "storageContainerUri": {
+            "value": "[variables('storageContainerUri')]"
+          },
+          "vmCount": {
+            "value": "[parameters('sqlvmCount')]"
+          },
+          "vmDiskSize": {
+            "value": "[parameters('sqlvmDiskSize')]"
+          },
+          "vmDiskCount": {
+            "value": "[parameters('sqlvmDiskCount')]"
+          },
+          "workloadType": {
+            "value": "[parameters('workloadType')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
           }
         }
-      ]
+      }
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -527,131 +427,6 @@
           }
         }
       }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-nic')]",
-      "apiVersion": "2016-03-30",
-      "location": "[parameters('location')]",
-      "copy": {
-        "name": "nicLoop",
-        "count": "[parameters('numberOfInstances')]"
-      },
-      "dependsOn": [
-        "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
-        "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]",
-        "VNet"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig2",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
-              },
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP'))]"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(parameters('virtualMachineName'),'-', copyIndex())]",
-      "apiVersion": "2016-04-30-preview",
-      "location": "[parameters('location')]",
-      "copy": {
-        "name": "virtualMachineLoop",
-        "count": "[parameters('numberOfInstances')]"
-      },
-      "dependsOn": [
-        "UpdateVNetDNS",
-        "nicLoop"
-      ],
-      "properties": {
-        "licenseType": "Windows_Server",
-        "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
-        },
-        "osProfile": {
-          "computerName": "[concat(parameters('virtualMachineName'),'-', copyIndex())]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
-        },
-        "storageProfile": {
-          "imageReference": "[variables('imageReference')]",
-          "osDisk": {
-            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'_OSDisk')]",
-            "vhd": {
-              "uri": "[concat(variables('storageContainerUri'), parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('virtualMachineName'),'-', copyIndex(),'-nic'))]"
-            }
-          ]
-        }
-      },
-      "resources": [
-        {
-          "type": "Microsoft.DevTestLab/schedules",
-          "apiVersion": "2016-05-15",
-          "name": "[concat('shutdown-computevm-', concat(parameters('virtualMachineName'),'-', copyIndex()))]",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat(parameters('virtualMachineName'),'-', copyIndex())]"
-          ],
-          "properties": {
-            "status": "[parameters('shutdown-status')]",
-            "taskType": "ComputeVmShutdownTask",
-            "dailyRecurrence": {
-              "time": "[variables('shutdownHour')]"
-            },
-            "timeZoneId": "[parameters('shutdown-timeZone')]",
-            "notificationSettings": {
-              "status": "Disabled",
-              "timeInMinutes": 30
-            },
-            "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-', copyIndex()))]"
-          }
-        },
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'/Antivir')]",
-          "apiVersion": "2019-07-01",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[concat(parameters('virtualMachineName'),'-', copyIndex())]"
-          ],
-
-          "properties": {
-            "publisher": "Microsoft.Azure.Security",
-            "type": "IaaSAntimalware",
-            "typeHandlerVersion": "1.3",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "AntimalwareEnabled": "false",
-              "RealtimeProtectionEnabled": "false",
-              "ScheduledScanSettings": {
-                "isEnabled": "false",
-                "scanType": "Quick",
-                "day": "7",
-                "time": "120"
-              }
-            },
-            "protectedSettings": null
-          }
-        }
-      ]
     },
     {
       "apiVersion": "2015-06-15",
