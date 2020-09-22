@@ -132,6 +132,33 @@
                         },
                         "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
                     }
+                },
+                {
+                    "type": "Microsoft.Compute/virtualMachines/extensions",
+                    "name": "[concat(parameters('vmName'),'/Antivir')]",
+                    "apiVersion": "2019-07-01",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[parameters('vmName')]"
+                    ],
+
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Security",
+                        "type": "IaaSAntimalware",
+                        "typeHandlerVersion": "1.3",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "AntimalwareEnabled": "false",
+                            "RealtimeProtectionEnabled": "false",
+                            "ScheduledScanSettings": {
+                                "isEnabled": "false",
+                                "scanType": "Quick",
+                                "day": "7",
+                                "time": "120"
+                            }
+                        },
+                        "protectedSettings": null
+                    }
                 }
             ]
         }
