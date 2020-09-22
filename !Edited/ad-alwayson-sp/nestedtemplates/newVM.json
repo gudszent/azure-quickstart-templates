@@ -64,6 +64,7 @@
             "name": "[parameters('vmName')]",
             "zones": "[parameters('zones')]",
             "properties": {
+                "licenseType": "Windows_Server",
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
