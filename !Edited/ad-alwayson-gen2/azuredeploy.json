@@ -33,7 +33,7 @@
     },
     "virtualMachineName": {
       "type": "string",
-      "defaultValue": "ffgsz",
+      "defaultValue": "fqfgsz",
       "metadata": {
         "description": "Virtual machine name."
       }
