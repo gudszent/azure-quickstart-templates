@@ -100,6 +100,46 @@
       },
       "defaultValue": "otto.local"
     },
+    "adVMSize": {
+      "type": "string",
+      "metadata": {
+        "group": "Active Directory settings",
+        "description": "The size of the AD VMs created"
+      },
+      "defaultValue": "Standard_DS1"
+    },
+    "adPdcNicIPAddress": {
+      "type": "string",
+      "metadata": {
+        "group": "Active Directory settings",
+        "description": "The IP address of the new AD VM"
+      },
+      "defaultValue": "10.0.0.4"
+    },
+    "adBdcNicIPAddress": {
+      "type": "string",
+      "metadata": {
+        "group": "Active Directory settings",
+        "description": "The IP address of the new AD VM"
+      },
+      "defaultValue": "10.0.0.5"
+    },
+    "sqlVMSize": {
+      "type": "string",
+      "metadata": {
+        "group": "SQL Server settings",
+        "description": "The size of the SQL VMs created"
+      },
+      "defaultValue": "Standard_DS3"
+    },
+    "witnessVMSize": {
+      "type": "string",
+      "metadata": {
+        "group": "SQL Server settings",
+        "description": "The size of the witness VM created"
+      },
+      "defaultValue": "Standard_DS1"
+    },
     "sqlServerServiceAccountUserName": {
       "type": "string",
       "metadata": {
@@ -115,6 +155,22 @@
         "description": "The SQL Server Service account password"
       },
       "defaultValue": "Alap12345678"
+    },
+    "sqlLBIPAddress": {
+      "type": "string",
+      "metadata": {
+        "group": "SQL Server settings",
+        "description": "The IP address of the new SQL ILB"
+      },
+      "defaultValue": "10.0.0.6"
+    },
+    "sqlSubnet": {
+      "type": "string",
+      "metadata": {
+        "group": "SQL Server settings",
+        "description": "The address range of the SQL subnet created in the new VNET"
+      },
+      "defaultValue": "10.0.1.0/24"
     },
     "spWebSubnet": {
       "type": "string",
@@ -157,14 +213,16 @@
       "metadata": {
         "group": "SharePoint Server settings",
         "description": "The new or existing - depending on value of spWebIPNewOrExisting parameter - IP address name for SP Web "
-      }
+      },
+      "defaultValue": "goadminspwebip"
     },
     "dnsPrefix": {
       "type": "string",
       "metadata": {
         "group": "SharePoint Server settings",
         "description": "The DNS Prefix for the Public IP Address for the Sharepoint Web Application"
-      }
+      },
+      "defaultValue": "goadminspwebapp"
     },
     "spVMSize": {
       "type": "string",
@@ -187,7 +245,8 @@
       "metadata": {
         "group": "SharePoint Server settings",
         "description": "The Sharepoint Setup account password"
-      }
+      },
+      "defaultValue": "Alap12345678"
     },
     "sharePointFarmAccountUserName": {
       "type": "string",
@@ -202,14 +261,16 @@
       "metadata": {
         "group": "SharePoint Server settings",
         "description": "The Sharepoint Farm account password"
-      }
+      },
+      "defaultValue": "Alap12345678"
     },
     "sharePointFarmPassphrasePassword": {
       "type": "securestring",
       "metadata": {
         "group": "SharePoint Server settings",
         "description": "The Sharepoint Farm Passphrase"
-      }
+      },
+      "defaultValue": "Alap12345678"
     },
     "spSiteTemplateName": {
       "type": "string",
@@ -256,7 +317,6 @@
     "vmSettings": {
       "availabilitySets": {
         "sqlAvailabilitySetName": "sqlAvailabilitySet",
-        "adAvailabilitySetName": "adAvailabilitySet",
         "spWebAvailabilitySetName": "spWebAvailabilitySet",
         "spAppAvailabilitySetName": "spAppAvailabilitySet"
       },
@@ -307,7 +367,6 @@
       "sqllbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbSettings').sqlLBName)]",
       "spCAlbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbSettings').spCALBName)]",
       "spCAResourceId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('spCAIPAddressName'))]",
-      "adAvailabilitySetName": "[resourceId('Microsoft.Compute/availabilitySets',variables('vmSettings').availabilitySets.adAvailabilitySetName)]",
       "sqlAvailabilitySetName": "[resourceId('Microsoft.Compute/availabilitySets',variables('vmSettings').availabilitySets.sqlAvailabilitySetName)]",
       "spWebAvailabilitySetName": "[resourceId('Microsoft.Compute/availabilitySets',variables('vmSettings').availabilitySets.spWebAvailabilitySetName)]",
       "spAppAvailabilitySetName": "[resourceId('Microsoft.Compute/availabilitySets',variables('vmSettings').availabilitySets.spAppAvailabilitySetName)]"
@@ -325,27 +384,7 @@
       "spCABEAddressPoolID": "[concat(variables('ids').spCAlbID,'/backendAddressPools/',variables('lbSettings').spCALBBE)]",
       "spCAlbFEConfigID": "[concat(variables('ids').spCAlbID,'/frontendIPConfigurations/',variables('lbSettings').spCALBFE)]",
       "spCANATRuleID": "[concat(variables('ids').spCAlbID,'/inboundNatRules/',variables('spCANAT'))]"
-    },
-    "subnets": [
-      {
-        "name": "[variables('subnetNames').staticSubnetName]",
-        "properties": {
-          "addressPrefix": "[parameters('staticSubnet')]"
-        }
-      },
-      {
-        "name": "[variables('subnetNames').spWebSubnetName]",
-        "properties": {
-          "addressPrefix": "[parameters('spWebSubnet')]"
-        }
-      },
-      {
-        "name": "[variables('subnetNames').spAppSubnetName]",
-        "properties": {
-          "addressPrefix": "[parameters('spAppSubnet')]"
-        }
-      }
-    ]
+    }
   },
   "resources": [
     {
@@ -453,106 +492,10 @@
       }
     },
     {
-      "name": "CreatingVirtualNetwork",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'),'/','nestedtemplates','/','vnet-new.json', parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "virtualNetworkName": {
-            "value": "[parameters('virtualNetworkName')]"
-          },
-          "virtualNetworkAddressRange": {
-            "value": "[parameters('virtualNetworkAddressRange')]"
-          },
-          "subnets": {
-            "value": "[variables('subnets')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "SettingUpLoadBalancers",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "Microsoft.Resources/deployments/SettingUpSharepointCentralAdminPublicIP",
-        "Microsoft.Resources/deployments/SettingUpSharepointWebPublicIP",
-        "Microsoft.Resources/deployments/CreatingVirtualNetwork"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'),'/','nestedtemplates','/','setupLBs.json', parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "spCALBName": {
-            "value": "[variables('lbSettings').spCALBName]"
-          },
-          "spCALBFE": {
-            "value": "[variables('lbSettings').spCALBFE]"
-          },
-          "spCAResourceId": {
-            "value": "[variables('ids').spCAResourceId]"
-          },
-          "spCALBBE": {
-            "value": "[variables('lbSettings').spCALBBE]"
-          },
-          "spCANAT": {
-            "value": "[variables('spCANAT')]"
-          },
-          "spCAlbFEConfigID": {
-            "value": "[variables('derivedIds').spCAlbFEConfigID]"
-          },
-          "spWebLBName": {
-            "value": "[variables('lbSettings').spWebLBName]"
-          },
-          "spWebLBFE": {
-            "value": "[variables('lbSettings').spWebLBFE]"
-          },
-          "spWebResourceId": {
-            "value": "[variables(concat('spWebResourceId',parameters('spWebIPNewOrExisting')))]"
-          },
-          "spWebLBBE": {
-            "value": "[variables('lbSettings').spWebLBBE]"
-          },
-          "spWebLB": {
-            "value": "[variables('lbSettings').spWebLB]"
-          },
-          "spWebLBFEConfigID": {
-            "value": "[variables('derivedIds').spWebLBFEConfigID]"
-          },
-          "spWebBEAddressPoolID": {
-            "value": "[variables('derivedIds').spWebBEAddressPoolID]"
-          },
-          "spWebProbeID": {
-            "value": "[variables('derivedIds').spWebProbeID]"
-          },
-          "spWebProbe": {
-            "value": "[variables('spWebProbe')]"
-          }
-        }
-      }
-    },
-    {
       "name": "CreatingNetworkInterfaces",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "Microsoft.Resources/deployments/CreatingVirtualNetwork",
-        "Microsoft.Resources/deployments/SettingUpRdp",
-        "Microsoft.Resources/deployments/SettingUpLoadBalancers"
       ],
       "properties": {
         "mode": "Incremental",
@@ -648,96 +591,9 @@
           },
           "domainName": {
             "value": "[parameters('domainName')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "ConfiguringSharepoint",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "Microsoft.Resources/deployments/ConfiguringSQLAlwaysOnCluster",
-        "Microsoft.Resources/deployments/CreatingSharepointVirtualMachines"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'),'/','nestedtemplates','/','configuringSharePoint.json', parameters('_artifactsLocationSasToken'))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "spappVMName": {
-            "value": "[variables('vmSettings').spappVMName]"
           },
-          "sqlVMName": {
-            "value": "[variables('vmSettings').sqlVMName]"
-          },
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "spConfigurationModulesURL": {
-            "value": "[concat(parameters('_artifactsLocation'),'/','dscv2','/','ConfigureSharePointServerHA.ps1.zip', parameters('_artifactsLocationSasToken'))]"
-          },
-          "spConfigurationFunction": {
-            "value": "ConfigureSharePointServerHA.ps1\\ConfigureSharePointServerHA"
-          },
-          "domainName": {
-            "value": "[parameters('domainName')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "sharePointSetupUserAccountUserName": {
-            "value": "[parameters('sharePointSetupUserAccountUserName')]"
-          },
-          "sharePointFarmAccountUserName": {
-            "value": "[parameters('sharePointFarmAccountUserName')]"
-          },
-          "sqlServerServiceAccountUserName": {
-            "value": "[parameters('sqlServerServiceAccountUserName')]"
-          },
-          "sqlAOAGName": {
-            "value": "[variables('sqlAOAGName')]"
-          },
-          "administrationContentDatabaseName": {
-            "value": "[variables('administrationContentDatabaseName')]"
-          },
-          "configDatabaseName": {
-            "value": "[variables('configDatabaseName')]"
-          },
-          "contentDatabaseName": {
-            "value": "[variables('contentDatabaseName')]"
-          },
-          "sharepointCAfqdn": {
-            "value": "[variables('sharepointCAfqdn')]"
-          },
-          "sharePointSetupUserAccountPassword": {
-            "value": "[parameters('sharePointSetupUserAccountPassword')]"
-          },
-          "sharePointFarmAccountPassword": {
-            "value": "[parameters('sharePointFarmAccountPassword')]"
-          },
-          "sharePointFarmPassphrasePassword": {
-            "value": "[parameters('sharePointFarmPassphrasePassword')]"
-          },
-          "sqlServerServiceAccountPassword": {
-            "value": "[parameters('sqlServerServiceAccountPassword')]"
-          },
-          "spwebVMName": {
-            "value": "[variables('vmSettings').spwebVMName]"
-          },
-          "sharepointFarmName": {
-            "value": "[parameters('sharepointFarmName')]"
-          },
-          "sharepointWebfqdn": {
-            "value": "[variables('sharepointWebfqdn')]"
-          },
-          "spSiteTemplateName": {
-            "value": "[parameters('spSiteTemplateName')]"
+          "DNSServer": {
+            "value": "[parameters('adPdcNicIPAddress')]"
           }
         }
       }
