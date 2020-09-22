@@ -108,10 +108,10 @@
                 {
                     "type": "Microsoft.DevTestLab/schedules",
                     "apiVersion": "2016-05-15",
-                    "name": "[concat('shutdown-computevm-', concat(parameters('vmName'),'-', copyIndex()))]",
+                    "name": "[concat('shutdown-computevm-', parameters('vmName'))]",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[concat(parameters('vmName'),'-', copyIndex())]"
+                        "[parameters('vmName')]"
                     ],
                     "properties": {
                         "status": "[parameters('shutdown-status')]",
@@ -124,7 +124,7 @@
                             "status": "Disabled",
                             "timeInMinutes": 30
                         },
-                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('vmName'),'-', copyIndex()))]"
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
                     }
                 }
             ]
