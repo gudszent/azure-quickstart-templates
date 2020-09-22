@@ -132,6 +132,9 @@
             "apiVersion": "2019-02-01",
             "name": "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat(parameters('virtualMachineName'),'-AD','-publicIP')]"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {

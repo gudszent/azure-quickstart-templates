@@ -33,7 +33,7 @@
     },
     "virtualMachineName": {
       "type": "string",
-      "defaultValue": "fafgsz",
+      "defaultValue": "fcfgsz",
       "metadata": {
         "description": "Virtual machine name."
       }
@@ -426,8 +426,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "dependsOn": [
-        "[concat(parameters('virtualMachineName'),'-VNet')]",
-        "[toLower(concat(parameters('virtualMachineName'),'sa'))]"
+        "UpdateVNetDNS"
       ],
       "properties": {
         "mode": "Incremental",
@@ -483,7 +482,7 @@
           },
           "ouPath": {
             "value": "[parameters('ouPath')]"
-          },          
+          },
           "storageContainerUri": {
             "value": "[variables('storageContainerUri')]"
           },
