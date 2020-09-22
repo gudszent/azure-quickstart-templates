@@ -2,113 +2,219 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+
+        "domainName": {
+            "type": "string",
+            "defaultValue": "otto.local",
+            "metadata": {
+                "description": "The FQDN of the Active Directory Domain to be created"
+            }
+        },
+        "advmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3",
+            "metadata": {
+                "description": "Size of the ADVM for the controller"
+            }
+        },
         "location": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
         },
-        "vmName": {
-            "type": "string"
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "VMname",
+            "metadata": {
+                "description": "Virtual machine name."
+            }
         },
-        "vmSize": {
-            "type": "string"
+        "virtualNetworkAddressRange": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Virtual network address range."
+            }
         },
-        "vmDiskCount": {
-            "type": "int"
+        "privateIPAddress": {
+            "type": "string",
+            "defaultValue": "10.0.0.4",
+            "metadata": {
+                "description": "Private IP address."
+            }
         },
-        "vmDiskSize": {
-            "type": "int"
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Subnet",
+            "metadata": {
+                "description": "Subnet name."
+            }
         },
-        "adminUsername": {
-            "type": "string"
-        },
-        "adminPassword": {
-            "type": "securestring"
-        },
-        "imagePublisher": {
-            "type": "string"
-        },
-        "imageOffer": {
-            "type": "string"
-        },
-        "imageSKU": {
-            "type": "string"
-        },
-        "imageVersion": {
-            "type": "string"
-        },
-        "zones": {
-            "type": "array"
+        "subnetRange": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "description": "Subnet IP range."
+            }
         },
         "shutdown-status": {
-            "type": "string"
+            "type": "string",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "defaultValue": "Enabled"
         },
         "shutdownHour": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "1700"
         },
         "shutdown-timeZone": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "W. Europe Standard Time"
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Administrator of the existing Active Directory Domain"
+            }
+        },
+        "adminPassword": {
+            "type": "string",
+            "minLength": 12,
+            "metadata": {
+                "description": "Password for the Administrator account of the existing Active Directory Domain"
+            }
+        },
+        "imageReference": {
+            "type": "object",
+            "metadata": {
+                "description": "description"
+            }
         },
         "storageContainerUri": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "numberOfInstances": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "ouPath": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
         },
         "_artifactsLocation": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
+            },
+            "defaultValue": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/ad-alwayson-gen2/"
         },
         "_artifactsLocationSasToken": {
-            "type": "securestring"
+            "type": "string",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+            },
+            "defaultValue": ""
         }
     },
     "variables": {
     },
     "resources": [
         {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]",
             "location": "[parameters('location')]",
-            "name": "[parameters('vmName')]",
-            "zones": "[parameters('zones')]",
+            "copy": {
+                "name": "publicipLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-nic')]",
+            "apiVersion": "2016-03-30",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig2",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-NET'), parameters('subnetName'))]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex())]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "nicLoop"
+            ],
+            "properties": {
+                "licenseType": "Windows_Server",
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[parameters('vmName')]",
+                    "computerName": "[concat(parameters('virtualMachineName'),'-', copyIndex())]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[parameters('imagePublisher')]",
-                        "offer": "[parameters('imageOffer')]",
-                        "sku": "[parameters('imageSku')]",
-                        "version": "[parameters('imageVersion')]"
-                    },
+                    "imageReference": "[parameters('imageReference')]",
                     "osDisk": {
-                        "name": "[concat(parameters('vmName'),'-osdisk')]",
+                        "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'_OSDisk')]",
                         "vhd": {
-                            "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-osdisk.vhd')]"
+                            "uri": "[concat(parameters('storageContainerUri'), parameters('virtualMachineName'),'-osdisk.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
-                    },
-                    "copy": [
-                        {
-                            "name": "dataDisks",
-                            "count": "[parameters('vmDiskCount')]",
-                            "input": {
-                                "diskSizeGB": "[parameters('vmDiskSize')]",
-                                "lun": "[copyIndex('dataDisks')]",
-                                "vhd": {
-                                    "uri": "[concat(parameters('storageContainerUri'), parameters('vmName'),'-', copyIndex('dataDisks'),'-datadisk.vhd')]"
-                                },
-                                "createOption": "Empty"
-                            }
-                        }
-                    ]
+                    }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),'-nic'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('virtualMachineName'),'-', copyIndex(),'-nic'))]"
                         }
                     ]
                 }
@@ -117,10 +223,10 @@
                 {
                     "type": "Microsoft.DevTestLab/schedules",
                     "apiVersion": "2016-05-15",
-                    "name": "[concat('shutdown-computevm-', parameters('vmName'))]",
+                    "name": "[concat('shutdown-computevm-', concat(parameters('virtualMachineName'),'-', copyIndex()))]",
                     "location": "[parameters('location')]",
                     "dependsOn": [
-                        "[parameters('vmName')]"
+                        "[concat(parameters('virtualMachineName'),'-', copyIndex())]"
                     ],
                     "properties": {
                         "status": "[parameters('shutdown-status')]",
@@ -133,43 +239,39 @@
                             "status": "Disabled",
                             "timeInMinutes": 30
                         },
-                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
-                    }
-                },
-                {
-                    "type": "Microsoft.Compute/virtualMachines/extensions",
-                    "name": "[concat(parameters('vmName'),'/Antivir')]",
-                    "apiVersion": "2019-07-01",
-                    "location": "[resourceGroup().location]",
-                    "dependsOn": [
-                        "[parameters('vmName')]"
-                    ],
-
-                    "properties": {
-                        "publisher": "Microsoft.Azure.Security",
-                        "type": "IaaSAntimalware",
-                        "typeHandlerVersion": "1.3",
-                        "autoUpgradeMinorVersion": true,
-                        "settings": {
-                            "AntimalwareEnabled": "false",
-                            "RealtimeProtectionEnabled": "false",
-                            "ScheduledScanSettings": {
-                                "isEnabled": "false",
-                                "scanType": "Quick",
-                                "day": "7",
-                                "time": "120"
-                            }
-                        },
-                        "protectedSettings": null
+                        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('virtualMachineName'),'-', copyIndex()))]"
                     }
                 }
             ]
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(), '/JoinDomain')]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "virtualMachineDomainjoinLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "virtualMachineLoop"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "JsonADDomainExtension",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "Name": "[parameters('domainName')]",
+                    "OUPath": "[parameters('ouPath')]",
+                    "User": "[concat(parameters('domainName'), '\\', parameters('adminUsername'))]",
+                    "Restart": "true",
+                    "Options": "3"
+                },
+                "protectedSettings": {
+                    "Password": "[parameters('adminPassword')]"
+                }
+            }
         }
-    ],
-    "outputs": {
-        "vmName": {
-            "type": "string",
-            "value": "[parameters('vmName')]"
-        }
-    }
+    ]
 }

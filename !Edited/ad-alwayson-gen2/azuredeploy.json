@@ -167,27 +167,31 @@
       "type": "string",
       "metadata": {
         "description": "Name of the Administrator of the existing Active Directory Domain"
-      },"defaultValue": "goadmin"
+      },
+      "defaultValue": "goadmin"
     },
     "adminPassword": {
       "type": "securestring",
       "minLength": 12,
       "metadata": {
         "description": "Password for the Administrator account of the existing Active Directory Domain"
-      },"defaultValue": "Alap12345678"
+      },
+      "defaultValue": "Alap12345678"
     },
     "sqlServiceAccount": {
       "type": "string",
       "metadata": {
         "description": "Name of the user account to be used for the SQL Server service account. Do not use the same account speficied in adminUsername parameter"
-      },"defaultValue": "goadminsql"
+      },
+      "defaultValue": "goadminsql"
     },
     "sqlServicePassword": {
       "type": "securestring",
       "minLength": 12,
       "metadata": {
         "description": "Password to be used for the SQL Server service account"
-      },"defaultValue": "Alap12345678"
+      },
+      "defaultValue": "Alap12345678"
     },
     "enableOutboundInternet": {
       "type": "string",
@@ -230,7 +234,8 @@
   "variables": {
     "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',concat(parameters('virtualMachineName'),'-NET'))]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
-    "deployDCClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
+    "deployDCTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
+    "deployVMTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newVM_unmanaged.json', parameters('_artifactsLocationSasToken')))]",
     "deploySqlCluster": "deploySqlCluster",
     "Windows 2016": {
       "publisher": "MicrosoftWindowsServer",
@@ -324,7 +329,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('deployDCClusterTemplateURL')]",
+          "uri": "[variables('deployDCTemplateURL')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -415,6 +420,81 @@
           }
         }
       }
-    }  
+    },
+    {
+      "name": "[concat(parameters('virtualMachineName'),'-VM')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "dependsOn": [
+        "[concat(parameters('virtualMachineName'),'-VNet')]",
+        "[toLower(concat(parameters('virtualMachineName'),'sa'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('deployVMTemplateURL')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "virtualMachineName": {
+            "value": "[parameters('virtualMachineName')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "virtualNetworkAddressRange": {
+            "value": "[parameters('virtualNetworkAddressRange')]"
+          },
+          "privateIPAddress": {
+            "value": "[parameters('privateIPAddress')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "subnetRange": {
+            "value": "[parameters('subnetRange')]"
+          },
+          "shutdown-status": {
+            "value": "[parameters('shutdown-status')]"
+          },
+          "shutdownHour": {
+            "value": "[variables('shutdownHour')]"
+          },
+          "shutdown-timeZone": {
+            "value": "[parameters('shutdown-timeZone')]"
+          },
+          "imageReference": {
+            "value": "[variables(parameters('OS'))]"
+          },
+          "numberOfInstances": {
+            "value": "[parameters('numberOfInstances')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "ouPath": {
+            "value": "[parameters('ouPath')]"
+          },          
+          "storageContainerUri": {
+            "value": "[variables('storageContainerUri')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          }
+        }
+      }
+    }
   ]
 }
