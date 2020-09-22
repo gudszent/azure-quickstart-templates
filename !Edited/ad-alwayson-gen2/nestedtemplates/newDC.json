@@ -156,8 +156,7 @@
             "name": "[concat(parameters('virtualMachineName'),'-AD')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat(parameters('virtualMachineName'),'-AD','-nic')]",
-                "[concat(parameters('virtualMachineName'),'sa')]"
+                "[concat(parameters('virtualMachineName'),'-AD','-nic')]"
             ],
             "properties": {
                 "licenseType": "Windows_Server",
