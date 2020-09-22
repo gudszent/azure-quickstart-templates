@@ -10,13 +10,6 @@
                 "description": "The FQDN of the Active Directory Domain to be created"
             }
         },
-        "advmSize": {
-            "type": "string",
-            "defaultValue": "Standard_D2s_v3",
-            "metadata": {
-                "description": "Size of the ADVM for the controller"
-            }
-        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
@@ -31,32 +24,11 @@
                 "description": "Virtual machine name."
             }
         },
-        "virtualNetworkAddressRange": {
-            "type": "string",
-            "defaultValue": "10.0.0.0/16",
-            "metadata": {
-                "description": "Virtual network address range."
-            }
-        },
-        "privateIPAddress": {
-            "type": "string",
-            "defaultValue": "10.0.0.4",
-            "metadata": {
-                "description": "Private IP address."
-            }
-        },
         "subnetName": {
             "type": "string",
             "defaultValue": "Subnet",
             "metadata": {
                 "description": "Subnet name."
-            }
-        },
-        "subnetRange": {
-            "type": "string",
-            "defaultValue": "10.0.0.0/24",
-            "metadata": {
-                "description": "Subnet IP range."
             }
         },
         "shutdown-status": {
@@ -90,12 +62,6 @@
         },
         "imageReference": {
             "type": "object",
-            "metadata": {
-                "description": "description"
-            }
-        },
-        "storageContainerUri": {
-            "type": "string",
             "metadata": {
                 "description": "description"
             }
