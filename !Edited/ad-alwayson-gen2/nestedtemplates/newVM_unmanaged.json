@@ -101,7 +101,7 @@
             }
         },
         "numberOfInstances": {
-            "type": "string",
+            "type": "int",
             "metadata": {
                 "description": "description"
             }
