@@ -4,10 +4,14 @@
     "parameters": {
         "location": {
             "type": "string",
+            "allowedValues": [
+                "westeurope",
+                "eastus2"
+            ],
             "metadata": {
                 "description": "Location for the VM, only certain regions support zones during preview."
             }
-        },
+        },  
         "namePrefix": {
             "type": "string",
             "minLength": 3,
@@ -121,15 +125,6 @@
             "type": "string",
             "defaultValue": "latest"
         },
-        "shutdown-status": {
-            "type": "string"
-        },
-        "shutdownHour": {
-            "type": "string"
-        },
-        "shutdown-timeZone": {
-            "type": "string"
-        },
         "_artifactsLocation": {
             "type": "string"
         },
@@ -160,9 +155,6 @@
         "albBE": "[concat(variables('vmNamePrefix'),'albbe')]",
         "albBEAddressPoolID": "[concat(variables('albID'),'/backendAddressPools/',variables('albBE'))]",
         "albBEPoolTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/albBEPool.json',parameters('_artifactsLocationSasToken'))]",
-        "albFEConfigID1": "[concat(variables('albID'),'/frontendIPConfigurations/',variables('albFE1'))]",
-        "albProbe1": "[concat(variables('vmNamePrefix'),'albp1')]",
-        "albProbeID1": "[concat(variables('albID'),'/probes/',variables('albProbe1'))]",
         "lbName": "[concat(variables('vmNamePrefix'),'ilb')]",
         "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
         "lbFE1": "[concat(variables('vmNamePrefix'),'ilbfe1')]",
@@ -174,9 +166,7 @@
         "lbBEPoolTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/lbBEPool.json',parameters('_artifactsLocationSasToken'))]",
         "agListenerPort": 1433,
         "agProbePort": 59999,
-        "snatTcpPort": 59998,
-        "snatProbePort": 3389,
-        "zones": [ "1", "2", "3" ]
+        "zones": ["1","2","3"]
     },
     "resources": [
         {
@@ -287,37 +277,6 @@
                     {
                         "name": "[variables('albBE')]"
                     }
-                ],
-                "loadBalancingRules": [
-                    {
-                        "name": "outbound-snat-rule",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[variables('albFEConfigID1')]"
-                            },
-                            "backendAddressPool": {
-                                "id": "[variables('albBEAddressPoolID')]"
-                            },
-                            "probe": {
-                                "id": "[variables('albProbeID1')]"
-                            },
-                            "protocol": "Tcp",
-                            "frontendPort": "[variables('snatTcpPort')]",
-                            "backendPort": "[variables('snatTcpPort')]",
-                            "enableFloatingIP": false
-                        }
-                    }
-                ],
-                "probes": [
-                    {
-                        "name": "[variables('albProbe1')]",
-                        "properties": {
-                            "protocol": "Tcp",
-                            "port": "[variables('snatProbePort')]",
-                            "intervalInSeconds": 5,
-                            "numberOfProbes": 2
-                        }
-                    }
                 ]
             }
         },
@@ -338,7 +297,7 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[concat(parameters('nicVnetUri'),'/subnets/',parameters('existingSubnetName'))]"
-                            },
+                            },           
                             "primary": true
                         }
                     },
@@ -452,15 +411,6 @@
                     },
                     "imageSKU": {
                         "value": "[parameters('imageSKU')]"
-                    },
-                    "shutdown-status": {
-                        "value": "[parameters('shutdown-status')]"
-                    },
-                    "shutdownHour": {
-                        "value": "[parameters('shutdownHour')]"
-                    },
-                    "shutdown-timeZone": {
-                        "value": "[parameters('shutdown-timeZone')]"
                     },
                     "imageVersion": {
                         "value": "[parameters('imageVersion')]"
