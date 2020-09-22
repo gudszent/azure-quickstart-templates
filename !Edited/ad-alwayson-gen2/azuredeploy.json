@@ -370,18 +370,6 @@
           "storageContainerUri": {
             "value": "[variables('storageContainerUri')]"
           },
-          "vmCount": {
-            "value": "[parameters('sqlvmCount')]"
-          },
-          "vmDiskSize": {
-            "value": "[parameters('sqlvmDiskSize')]"
-          },
-          "vmDiskCount": {
-            "value": "[parameters('sqlvmDiskCount')]"
-          },
-          "workloadType": {
-            "value": "[parameters('workloadType')]"
-          },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
           },
