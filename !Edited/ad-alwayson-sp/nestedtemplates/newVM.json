@@ -82,7 +82,10 @@
                     "osDisk": {
                         "name": "[concat(parameters('vmName'),'-osdisk')]",
                         "caching": "ReadWrite",
-                        "createOption": "FromImage"
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        }
                     },
                     "copy": [
                         {
@@ -91,7 +94,10 @@
                             "input": {
                                 "diskSizeGB": "[parameters('vmDiskSize')]",
                                 "lun": "[copyIndex('dataDisks')]",
-                                "createOption": "Empty"
+                                "createOption": "Empty",
+                                "managedDisk": {
+                                    "storageAccountType": "Standard_LRS"
+                                }
                             }
                         }
                     ]
