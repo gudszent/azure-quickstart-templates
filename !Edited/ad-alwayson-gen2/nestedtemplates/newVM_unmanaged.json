@@ -205,7 +205,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'_OSDisk')]",
                         "vhd": {
-                            "uri": "[concat(parameters('storageContainerUri'), parameters('virtualMachineName'),'-osdisk.vhd')]"
+                            "uri": "[concat(parameters('storageContainerUri'), parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
