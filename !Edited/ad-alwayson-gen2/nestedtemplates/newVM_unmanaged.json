@@ -216,11 +216,11 @@
                 },
                 {
                     "type": "Microsoft.Compute/virtualMachines/extensions",
-                    "name": "[concat(parameters('virtualMachineName'),'-AD/Antivir')]",
+                    "name": "[concat(concat(parameters('virtualMachineName'),'-', copyIndex(),'/Antivir'))]",
                     "apiVersion": "2019-07-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
-                        "[concat(parameters('virtualMachineName'),'-AD')]"
+                        "[concat(concat(parameters('virtualMachineName'),'-', copyIndex()))]"
                     ],
 
                     "properties": {
