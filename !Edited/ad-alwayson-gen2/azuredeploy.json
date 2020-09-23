@@ -33,7 +33,7 @@
     },
     "virtualMachineName": {
       "type": "string",
-      "defaultValue": "fefgsz",
+      "defaultValue": "fgfgsz",
       "metadata": {
         "description": "Virtual machine name."
       }
@@ -232,7 +232,7 @@
     }
   },
   "variables": {
-    "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',concat(parameters('virtualMachineName'),'-NET'))]",
+    "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',concat(parameters('virtualMachineName'),'-VNet'))]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
     "deployDCTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
     "deployVMTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newVM_unmanaged.json', parameters('_artifactsLocationSasToken')))]",
@@ -269,7 +269,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "[concat(parameters('virtualMachineName'),'-VNet')]",
+      "name": "[variables('vnetRef')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -323,7 +323,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "dependsOn": [
-        "[concat(parameters('virtualMachineName'),'-VNet')]",
+        "[variables('vnetRef')]",
         "[toLower(concat(parameters('virtualMachineName'),'sa'))]"
       ],
       "properties": {
@@ -373,7 +373,7 @@
             "value": "[parameters('shutdown-timeZone')]"
           },
           "imageReference": {
-            "value": "[variables(parameters('OS'))]"
+            "value": "[variables('imageReference')]"
           },
           "storageContainerUri": {
             "value": "[variables('storageContainerUri')]"
@@ -466,7 +466,7 @@
             "value": "[parameters('shutdown-timeZone')]"
           },
           "imageReference": {
-            "value": "[variables(parameters('OS'))]"
+            "value": "[variables('imageReference')]"
           },
           "numberOfInstances": {
             "value": "[parameters('numberOfInstances')]"
