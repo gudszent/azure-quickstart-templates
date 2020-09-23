@@ -145,7 +145,7 @@
         "witnessStorageType": "Standard_LRS",
         "vmNamePrefix": "[concat(parameters('namePrefix'),'-sql-')]",
         "clusterName": "[concat(variables('vmNamePrefix'),'c')]",
-        "vmLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/newVM_managed.json',parameters('_artifactsLocationSasToken'))]",
+        "vmLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/newVM.json',parameters('_artifactsLocationSasToken'))]",
         "ipLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/getIpAddress.json',parameters('_artifactsLocationSasToken'))]",
         "sqlPrepModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/prep-sqlao.ps1.zip',parameters('_artifactsLocationSasToken'))]",
         "sqlPrepFunction": "PrepSQLAO.ps1\\PrepSQLAO",
