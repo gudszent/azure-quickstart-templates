@@ -85,7 +85,7 @@
     },
     "virtualMachineName": {
       "type": "string",
-      "defaultValue": "fhfgsz",
+      "defaultValue": "ffgsz",
       "metadata": {
         "Group": "Plus VM settings",
         "description": "Virtual machine name."
@@ -255,6 +255,7 @@
   },
   "variables": {
     "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',concat(parameters('virtualMachineName'),'-VNet'))]",
+    "vnetName": "[concat(parameters('virtualMachineName'),'-VNet')]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
     "deployDCTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
     "deployVMTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newVM_unmanaged.json', parameters('_artifactsLocationSasToken')))]",
@@ -291,7 +292,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "[variables('vnetRef')]",
+      "name": "[variables('vnetName')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -300,7 +301,7 @@
         },
         "parameters": {
           "virtualNetworkName": {
-            "value": "[variables('vnetRef')]"
+            "value": "[variables('vnetName')]"
           },
           "virtualNetworkAddressRange": {
             "value": "[parameters('virtualNetworkAddressRange')]"
@@ -345,7 +346,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "dependsOn": [
-        "[variables('vnetRef')]",
+        "[variables('vnetName')]",
         "[toLower(concat(parameters('virtualMachineName'),'sa'))]"
       ],
       "properties": {
@@ -424,7 +425,7 @@
         },
         "parameters": {
           "virtualNetworkName": {
-            "value": "[variables('vnetRef')]"
+            "value": "[variables('vnetName')]"
           },
           "virtualNetworkAddressRange": {
             "value": "[parameters('virtualNetworkAddressRange')]"
