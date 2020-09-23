@@ -450,17 +450,8 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "virtualNetworkAddressRange": {
-            "value": "[parameters('virtualNetworkAddressRange')]"
-          },
-          "privateIPAddress": {
-            "value": "[parameters('privateIPAddress')]"
-          },
           "subnetName": {
             "value": "[parameters('subnetName')]"
-          },
-          "subnetRange": {
-            "value": "[parameters('subnetRange')]"
           },
           "shutdown-status": {
             "value": "[parameters('shutdown-status')]"
