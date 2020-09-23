@@ -689,8 +689,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
-        "UpdateVNetDNS",
-        "nicLoop"
+        "UpdateVNetDNS"
       ],
       "properties": {
         "mode": "Incremental",
