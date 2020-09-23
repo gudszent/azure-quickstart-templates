@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "domainName": {
+            "value": "otto.local"
+        },
+        "advmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "vmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "location": {
+            "value": "[resourceGroup().location]" 
+        },
+        "virtualMachineName": {
+            "value": "fefgsz"
+        },
+        "virtualNetworkAddressRange": {
+            "value": "10.0.0.0/16"
+        },
+        "privateIPAddress": {
+            "value": "10.0.0.4"
+        },
+        "subnetName": {
+            "value": "Subnet"
+        },
+        "subnetRange": {
+            "value": "10.0.0.0/24"
+        },
+        "numberOfInstances": {
+            "value": 2
+        },
+        "OS": {
+            "value": "Windows 2016"
+        },
+        "ouPath": {
+            "value": ""
+        },
+        "shutdown-status": {
+            "value": "Enabled"
+        },
+        "shutdownHour": {
+            "value": "1700"
+        },
+        "shutdown-timeZone": {
+            "value": "W. Europe Standard Time"
+        },
+        "sqlvmSize": {
+            "value": "Standard_DS3_v2"
+        },
+        "sqlVMImage": {
+            "value": "SQL2016SP1-WS2016"
+        },
+        "sqlVMImageSku": {
+            "value": "SQLDEV"
+        },
+        "sqlvmCount": {
+            "value": 2
+        },
+        "sqlvmDiskSize": {
+            "value": 128
+        },
+        "sqlvmDiskCount": {
+            "value": 2
+        },
+        "adminUsername": {
+            "value": "goadmin"
+        },
+        "adminPassword": {
+            "value": "Alap12345678"
+        },
+        "sqlServiceAccount": {
+            "value": "goadminsql"
+        },
+        "sqlServicePassword": {
+            "value": "Alap12345678"
+        },
+        "enableOutboundInternet": {
+            "value": "No"
+        },
+        "workloadType": {
+            "value": "GENERAL"
+        },
+        "_artifactsLocation": {
+            "value": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/ad-alwayson-gen2/"
+        },
+        "_artifactsLocationSasToken": {
+            "value": ""
+        }
+    }
+}
