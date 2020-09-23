@@ -345,6 +345,9 @@
           "adminUsername": {
             "value": "[parameters('adminUsername')]"
           },
+          "advmSize": {
+            "value": "[parameters('advmSize')]"
+          },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
