@@ -2,20 +2,11 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "location": {
+            "value": "" 
+        },
         "domainName": {
             "value": "otto.local"
-        },
-        "advmSize": {
-            "value": "Standard_D2s_v3"
-        },
-        "vmSize": {
-            "value": "Standard_D2s_v3"
-        },
-        "location": {
-            "value": "[resourceGroup().location]" 
-        },
-        "virtualMachineName": {
-            "value": "fefgsz"
         },
         "virtualNetworkAddressRange": {
             "value": "10.0.0.0/16"
@@ -28,6 +19,21 @@
         },
         "subnetRange": {
             "value": "10.0.0.0/24"
+        },
+        "advmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "adminUsername": {
+            "value": "goadmin"
+        },
+        "adminPassword": {
+            "value": "Alap12345678"
+        },
+        "vmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "virtualMachineName": {
+            "value": "fegsz"
         },
         "numberOfInstances": {
             "value": 2
@@ -64,12 +70,6 @@
         },
         "sqlvmDiskCount": {
             "value": 2
-        },
-        "adminUsername": {
-            "value": "goadmin"
-        },
-        "adminPassword": {
-            "value": "Alap12345678"
         },
         "sqlServiceAccount": {
             "value": "goadminsql"
