@@ -85,6 +85,9 @@
         },
         "_artifactsLocationSasToken": {
             "value": ""
+        },
+        "vmavailabilityset": {
+            "value": ""
         }
     }
 }
