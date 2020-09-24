@@ -182,7 +182,8 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "nicLoop"
+                "nicLoop",
+                "[parameters('vmavailabilityset')]"
             ],
             "properties": {
                 "licenseType": "Windows_Server",

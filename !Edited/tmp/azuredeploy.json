@@ -85,7 +85,7 @@
     },
     "virtualMachineName": {
       "type": "string",
-      "defaultValue": "fegsz",
+      "defaultValue": "ftgsz",
       "metadata": {
         "Group": "Plus VM settings",
         "description": "Virtual machine name."
