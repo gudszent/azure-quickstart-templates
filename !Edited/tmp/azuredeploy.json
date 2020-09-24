@@ -377,7 +377,7 @@
             "value": "[variables('storageContainerUri')]"
           },
           "vmavailabilityset": {
-            "value": "[variables('storageContainerUri')]"
+            "value": "[variables('vmavailabilityset')]"
           },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
