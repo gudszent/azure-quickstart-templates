@@ -115,6 +115,22 @@
     },
     "resources": [
         {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2019-07-01",
+            "name": "[parameters('vmavailabilityset')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[parameters('vmavailabilityset')]"
+            },
+            "sku": {
+                "name": "Classic"
+            },
+            "properties": {
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 2
+            }
+        },
+        {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
             "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP')]",

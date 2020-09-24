@@ -256,9 +256,10 @@
   "variables": {
     "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "vnetName": "[concat(parameters('virtualMachineName'),'-VNet')]",
+    "vmName":  "[concat(parameters('virtualMachineName'),'-VM')]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
     "deployDCTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
-    "deployVMTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newVM_unmanaged.json', parameters('_artifactsLocationSasToken')))]",
+    "deployVMTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newVM_unmanaged_availabilityset.json', parameters('_artifactsLocationSasToken')))]",
     "deploySqlCluster": "deploySqlCluster",
     "Windows 2016": {
       "publisher": "MicrosoftWindowsServer",
@@ -292,22 +293,6 @@
       "properties": {}
     },
     {
-      "type": "Microsoft.Compute/availabilitySets",
-      "apiVersion": "2019-07-01",
-      "name": "[variables('vmavailabilityset')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "[variables('vmavailabilityset')]"
-      },
-      "sku": {
-        "name": "Classic"
-      },
-      "properties": {
-        "platformFaultDomainCount": 2,
-        "platformUpdateDomainCount": 2
-      }
-    },
-    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "[variables('vnetName')]",
@@ -337,30 +322,7 @@
       }
     },
     {
-      "name": "[concat(parameters('virtualMachineName'),'-NSG')]",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-3389",
-            "properties": {
-              "priority": 1000,
-              "access": "Allow",
-              "direction": "Inbound",
-              "destinationPortRange": "3389",
-              "protocol": "Tcp",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[concat(parameters('virtualMachineName'),'-VM')]",
+      "name": "[variables('vmName')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "dependsOn": [

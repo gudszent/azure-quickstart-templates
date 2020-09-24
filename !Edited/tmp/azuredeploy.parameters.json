@@ -81,12 +81,9 @@
             "value": "GENERAL"
         },
         "_artifactsLocation": {
-            "value": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/ad-alwayson-gen2/"
+            "value": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/tmp/"
         },
         "_artifactsLocationSasToken": {
-            "value": ""
-        },
-        "vmavailabilityset": {
             "value": ""
         }
     }
