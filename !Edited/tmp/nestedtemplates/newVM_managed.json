@@ -66,12 +66,6 @@
                 "description": "description"
             }
         },
-        "storageContainerUri": {
-            "type": "string",
-            "metadata": {
-                "description": "description"
-            }
-        },
         "numberOfInstances": {
             "type": "int",
             "metadata": {
@@ -175,12 +169,12 @@
                 "storageProfile": {
                     "imageReference": "[parameters('imageReference')]",
                     "osDisk": {
-                        "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'_OSDisk')]",
-                        "vhd": {
-                            "uri": "[concat(parameters('storageContainerUri'), parameters('virtualMachineName'),'-', copyIndex(),'-osdisk.vhd')]"
-                        },
+                        "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'-osdisk')]",
                         "caching": "ReadWrite",
-                        "createOption": "FromImage"
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        }
                     }
                 },
                 "networkProfile": {
@@ -216,11 +210,11 @@
                 },
                 {
                     "type": "Microsoft.Compute/virtualMachines/extensions",
-                    "name": "[concat(concat(parameters('virtualMachineName'),'-', copyIndex(),'/Antivir'))]",
+                    "name": "[concat(parameters('virtualMachineName'),'-', copyIndex(),'/Antivir')]",
                     "apiVersion": "2019-07-01",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
-                        "[concat(concat(parameters('virtualMachineName'),'-', copyIndex()))]"
+                        "[concat(parameters('virtualMachineName'),'-', copyIndex())]"
                     ],
 
                     "properties": {

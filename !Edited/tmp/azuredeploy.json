@@ -243,7 +243,7 @@
       "metadata": {
         "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
       },
-      "defaultValue": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/ad-alwayson-gen2/"
+      "defaultValue": "https://raw.githubusercontent.com/gudszent/azure-quickstart-templates/master/!Edited/tmp/"
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
@@ -254,7 +254,7 @@
     }
   },
   "variables": {
-    "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',concat(parameters('virtualMachineName'),'-VNet'))]",
+    "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "vnetName": "[concat(parameters('virtualMachineName'),'-VNet')]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
     "deployDCTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
@@ -274,20 +274,38 @@
     },
     "imageReference": "[variables(parameters('OS'))]",
     "shutdownHour": "[replace(parameters('shutdownHour'), ':', '')]",
+    "storageaccount": "[toLower(concat(parameters('virtualMachineName'),'sa'))]",
     "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]",
-    "deployDC": "[concat(parameters('virtualMachineName'),'-DeployDC')]"
+    "deployDC": "[concat(parameters('virtualMachineName'),'-DeployDC')]",
+    "vmavailabilityset": "[concat(parameters('virtualMachineName'),'-vmavailabilityset')]"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2018-07-01",
-      "name": "[toLower(concat(parameters('virtualMachineName'),'sa'))]",
+      "name": "[variables('storageaccount')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "Standard_LRS"
       },
       "kind": "Storage",
       "properties": {}
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "apiVersion": "2019-07-01",
+      "name": "[variables('vmavailabilityset')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "[variables('vmavailabilityset')]"
+      },
+      "sku": {
+        "name": "Classic"
+      },
+      "properties": {
+        "platformFaultDomainCount": 2,
+        "platformUpdateDomainCount": 2
+      }
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -342,117 +360,10 @@
       }
     },
     {
-      "name": "[variables('deployDC')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
-      "dependsOn": [
-        "[variables('vnetName')]",
-        "[toLower(concat(parameters('virtualMachineName'),'sa'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('deployDCTemplateURL')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "virtualMachineName": {
-            "value": "[parameters('virtualMachineName')]"
-          },
-          "domainName": {
-            "value": "[parameters('domainName')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "advmSize": {
-            "value": "[parameters('advmSize')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "virtualNetworkAddressRange": {
-            "value": "[parameters('virtualNetworkAddressRange')]"
-          },
-          "privateIPAddress": {
-            "value": "[parameters('privateIPAddress')]"
-          },
-          "subnetName": {
-            "value": "[parameters('subnetName')]"
-          },
-          "subnetRange": {
-            "value": "[parameters('subnetRange')]"
-          },
-          "shutdown-status": {
-            "value": "[parameters('shutdown-status')]"
-          },
-          "shutdownHour": {
-            "value": "[variables('shutdownHour')]"
-          },
-          "shutdown-timeZone": {
-            "value": "[parameters('shutdown-timeZone')]"
-          },
-          "imageReference": {
-            "value": "[variables('imageReference')]"
-          },
-          "storageContainerUri": {
-            "value": "[variables('storageContainerUri')]"
-          },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
-          },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
-      "name": "UpdateVNetDNS",
-      "dependsOn": [
-        "[variables('deployDC')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vnet-with-dns-server.json', parameters('_artifactsLocationSasToken')))]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "virtualNetworkName": {
-            "value": "[variables('vnetName')]"
-          },
-          "virtualNetworkAddressRange": {
-            "value": "[parameters('virtualNetworkAddressRange')]"
-          },
-          "subnetName": {
-            "value": "[parameters('subnetName')]"
-          },
-          "subnetRange": {
-            "value": "[parameters('subnetRange')]"
-          },
-          "DNSServerAddress": {
-            "value": [
-              "[parameters('privateIPAddress')]"
-            ]
-          },
-          "location": {
-            "value": "[parameters('location')]"
-          }
-        }
-      }
-    },
-    {
       "name": "[concat(parameters('virtualMachineName'),'-VM')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "dependsOn": [
-        "UpdateVNetDNS"
       ],
       "properties": {
         "mode": "Incremental",
@@ -503,88 +414,8 @@
           "storageContainerUri": {
             "value": "[variables('storageContainerUri')]"
           },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
-          },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "[variables('deploySqlCluster')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [
-        "UpdateVNetDNS"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('deploySqlClusterTemplateURL')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "namePrefix": {
-            "value": "[parameters('virtualMachineName')]"
-          },
-          "domainName": {
-            "value": "[parameters('domainName')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "sqlServiceAccount": {
-            "value": "[parameters('sqlServiceAccount')]"
-          },
-          "sqlServicePassword": {
-            "value": "[parameters('sqlServicePassword')]"
-          },
-          "nicVnetUri": {
-            "value": "[variables('vnetRef')]"
-          },
-          "existingSubnetName": {
-            "value": "[parameters('subnetName')]"
-          },
-          "enableOutboundInternet": {
-            "value": "[parameters('enableOutboundInternet')]"
-          },
-          "vmSize": {
-            "value": "[parameters('sqlvmSize')]"
-          },
-          "imageOffer": {
-            "value": "[parameters('sqlVMImage')]"
-          },
-          "imageSKU": {
-            "value": "[parameters('sqlVMImageSku')]"
-          },
-          "vmCount": {
-            "value": "[parameters('sqlvmCount')]"
-          },
-          "vmDiskSize": {
-            "value": "[parameters('sqlvmDiskSize')]"
-          },
-          "vmDiskCount": {
-            "value": "[parameters('sqlvmDiskCount')]"
-          },
-          "workloadType": {
-            "value": "[parameters('workloadType')]"
-          },
-          "shutdown-status": {
-            "value": "[parameters('shutdown-status')]"
-          },
-          "shutdownHour": {
-            "value": "[variables('shutdownHour')]"
-          },
-          "shutdown-timeZone": {
-            "value": "[parameters('shutdown-timeZone')]"
+          "vmavailabilityset": {
+            "value": "[variables('vmavailabilityset')]"
           },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"

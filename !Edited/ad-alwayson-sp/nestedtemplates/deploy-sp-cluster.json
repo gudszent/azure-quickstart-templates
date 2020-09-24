@@ -1,0 +1,38 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        
+    "virtualMachineName": {
+      "type": "string",
+      "defaultValue": "fegsz",
+      "metadata": {
+        "Group": "Plus VM settings",
+        "description": "Virtual machine name."
+      }
+    }
+    },
+    "functions": [],
+    "variables": {
+        "SQLavailabilityset": "[concat(parameters('virtualMachineName'),'-availabilitySets')]"
+    },
+    "resources": [
+    {
+        "name": "SQLavailabilityset",
+        "type": "Microsoft.Compute/availabilitySets",
+        "apiVersion": "2019-07-01",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "displayName": "SQLavailabilityset"
+        },
+        "properties": {
+           "platformFaultDomainCount": "2",
+           "platformUpdateDomainCount": "2"
+        },
+        "sku": {
+            "name": "Classic"
+        }
+    }
+    ],
+    "outputs": {}
+}
