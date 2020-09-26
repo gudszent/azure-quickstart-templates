@@ -11,10 +11,6 @@
             "apiVersion": "2019-02-01",
             "name": "lb-publicIP",
             "location": "[resourceGroup().location]",
-            "copy": {
-                "name": "publicipLoop",
-                "count": "2"
-            },
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
             }
