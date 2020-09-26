@@ -169,7 +169,7 @@
                             },
                             "loadBalancerBackendAddressPools": [
                                 {
-                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'loadBalancerExternal1')]"
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'loadBalancerExternal1','loadBalancerBackEndPool1')]"
                                 }
                             ]
                         }
