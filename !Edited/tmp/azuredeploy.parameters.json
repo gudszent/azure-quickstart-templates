@@ -30,7 +30,7 @@
             "value": "Standard_D2s_v3"
         },
         "virtualMachineName": {
-            "value": "fhgsz"
+            "value": "fhhgsz"
         },
         "numberOfInstances": {
             "value": 2
