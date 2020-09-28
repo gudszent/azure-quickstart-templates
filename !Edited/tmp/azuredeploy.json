@@ -328,6 +328,9 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "[variables('lbname')]",
+      "dependsOn": [
+        "[variables('vnetName')]"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
