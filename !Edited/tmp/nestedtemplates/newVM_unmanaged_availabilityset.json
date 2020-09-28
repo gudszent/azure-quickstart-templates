@@ -90,6 +90,19 @@
                 "description": "description"
             }
         },
+        "lbname": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "lbbackend": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "[concat(parameters('lbname'),'-Backend')]"
+        },
         "ouPath": {
             "type": "string",
             "metadata": {
@@ -169,7 +182,7 @@
                             },
                             "loadBalancerBackendAddressPools": [
                                 {
-                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'loadBalancerExternal1','loadBalancerBackEndPool1')]"
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('lbname'),parameters('lbbackend'))]"
                                 }
                             ]
                         }

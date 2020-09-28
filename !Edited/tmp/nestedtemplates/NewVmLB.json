@@ -1,39 +1,35 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "lbname": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "lbbackend": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },"defaultValue": "[concat(parameters('lbname'),'-Backend')]"
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },"defaultValue": "[resourceGroup().location]"
+        }
+
+    },
     "functions": [],
     "variables": {},
     "resources": [
-                {
-            "type": "Microsoft.Network/loadBalancers",
-            "apiVersion": "2020-05-01",
-            "name": "[parameters('name')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]"
-            ],
-            "tags": {},
-            "sku": {
-                "name": "[parameters('sku')]"
-            },
-            "properties": {
-                "frontendIPConfigurations": [
-                    {
-                        "name": "LoadBalancerFrontEnd",
-                        "properties": {
-                            "publicIPAddress": {
-                                "id": "[resourceId('test-deploy', 'Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
+
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-02-01",
-            "name": "[parameters('publicIPAddressName')]",
+            "name": "[concat(parameters('lbname'),'-Publicip')]",
             "location": "[parameters('location')]",
             "tags": {},
             "sku": {
@@ -43,6 +39,78 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "publicIPAddressVersion": "IPv4",
                 "ipTags": []
+            }
+        },
+{
+            "name": "[parameters('lbname')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('lbname'),'-Publicip'))]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[concat(parameters('lbname'),'-Frontend')]",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',  concat(parameters('lbname'),'-Publicip'))]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[parameters('lbbackend')]"
+                    }
+                ],
+                "inboundNatRules": [
+                    {
+                        "name": "[concat(parameters('lbname'),'-NatRule')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', parameters('lbname'), concat(parameters('lbname'),'-Frontend'))]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 50001,
+                            "backendPort": 3389,
+                            "enableFloatingIP": false
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "[concat(parameters('lbname'),'-Rule')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', parameters('lbname'), concat(parameters('lbname'),'-Frontend'))]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('lbname'), concat(parameters('lbname'),'-Backend'))]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/probes', parameters('lbname'), concat(parameters('lbname'),'-Probe'))]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[concat(parameters('lbname'),'-Prube')]",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2
+                        }
+                    }
+                ]
             }
         }
     ],

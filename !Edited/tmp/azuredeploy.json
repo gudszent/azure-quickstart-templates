@@ -256,7 +256,7 @@
   "variables": {
     "vnetRef": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "vnetName": "[concat(parameters('virtualMachineName'),'-VNet')]",
-    "vmName":  "[concat(parameters('virtualMachineName'),'-VM')]",
+    "vmName": "[concat(parameters('virtualMachineName'),'-VM')]",
     "deploySqlClusterTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/deploy-sql-cluster.json', parameters('_artifactsLocationSasToken')))]",
     "deployDCTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newDC.json', parameters('_artifactsLocationSasToken')))]",
     "deployVMTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/newVM_unmanaged_availabilityset.json', parameters('_artifactsLocationSasToken')))]",
@@ -278,7 +278,10 @@
     "storageaccount": "[toLower(concat(parameters('virtualMachineName'),'sa'))]",
     "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]",
     "deployDC": "[concat(parameters('virtualMachineName'),'-DeployDC')]",
-    "vmavailabilityset": "[concat(parameters('virtualMachineName'),'-vmavailabilityset')]"
+    "vmavailabilityset": "[concat(parameters('virtualMachineName'),'-vmavailabilityset')]",
+    "deployLBTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/NewVmLB.json', parameters('_artifactsLocationSasToken')))]",
+    "lbname": "[concat(parameters('virtualMachineName'),'-lbname')]",
+    "lbbackend": "[concat(variables('lbname'),'-backend')]"
   },
   "resources": [
     {
@@ -322,10 +325,33 @@
       }
     },
     {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "[variables('lbname')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('deployLBTemplateURL')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "lbname": {
+            "value": "[variables('lbname')]"
+          },
+          "lbbackend": {
+            "value": "[variables('lbbackend')]"
+          }
+        }
+      }
+    },
+    {
       "name": "[variables('vmName')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "dependsOn": [
+        "[variables('lbname')]",
+        "[variables('storageaccount')]",
+        "[variables('vnetName')]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -378,6 +404,12 @@
           },
           "vmavailabilityset": {
             "value": "[variables('vmavailabilityset')]"
+          },
+          "lbname": {
+            "value": "[variables('lbname')]"
+          },
+          "lbbackend": {
+            "value": "[variables('lbbackend')]"
           },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
