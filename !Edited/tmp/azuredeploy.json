@@ -475,6 +475,9 @@
           "vmavailabilityset": {
             "value": "[variables('sqlvmavailabilityset')]"
           },
+          "ipLoopTemplateURL": {
+            "value": "[variables('ipLoopTemplateURL')]"
+          },
           "_artifactsLocation": {
             "value": "[parameters('_artifactsLocation')]"
           },

@@ -62,6 +62,9 @@
         "vmavailabilityset": {
             "type": "string"
         },
+        "ipLoopTemplateURL": {
+            "type": "string"
+        },
         "_artifactsLocation": {
             "type": "string"
         },
@@ -166,6 +169,52 @@
                     },
                     "_artifactsLocationSasToken": {
                         "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "[concat(parameters('vmName'),'-0-clusterIp')]",
+            "dependsOn": [
+                "nicLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('ipLoopTemplateURL')]"
+                },
+                "parameters": {
+                    "ipConfig": {
+                        "value": "[reference(concat(parameters('vmName'), '-0-nic')).ipConfigurations[1].properties.privateIPAddress]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "copy": {
+                "name": "clusterIpLoop",
+                "count": "[sub(parameters('numberOfInstances'),1)]"
+            },
+            "name": "[concat(parameters('vmName'),'-',copyIndex(1),'-clusterIp')]",
+            "dependsOn": [
+               "[parameters('vmName')]",
+                "[concat(parameters('vmName'),'-0-clusterIp')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('ipLoopTemplateURL')]"
+                },
+                "parameters": {
+                    "ipConfig": {
+                        "value": "[reference(concat(parameters('vmName'),'-', copyIndex(1), '-nic')).ipConfigurations[1].properties.privateIPAddress]"
+                    },
+                    "ipAddresses": {
+                        "value": "[reference(concat(parameters('vmName'),'-',copyIndex(1),'-clusterIp')).outputs.result.value]"
                     }
                 }
             }
