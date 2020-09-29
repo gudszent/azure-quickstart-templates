@@ -30,7 +30,7 @@
             "value": "Standard_D2s_v3"
         },
         "virtualMachineName": {
-            "value": "ftgsz"
+            "value": "fogsz"
         },
         "numberOfInstances": {
             "value": 2
