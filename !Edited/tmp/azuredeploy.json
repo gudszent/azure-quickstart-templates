@@ -325,6 +325,75 @@
       }
     },
     {
+      "name": "[variables('deployDC')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "dependsOn": [
+        "[variables('vnetName')]",
+       "[variables('storageaccount')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('deployDCTemplateURL')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "virtualMachineName": {
+            "value": "[parameters('virtualMachineName')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "advmSize": {
+            "value": "[parameters('advmSize')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "virtualNetworkAddressRange": {
+            "value": "[parameters('virtualNetworkAddressRange')]"
+          },
+          "privateIPAddress": {
+            "value": "[parameters('privateIPAddress')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "subnetRange": {
+            "value": "[parameters('subnetRange')]"
+          },
+          "shutdown-status": {
+            "value": "[parameters('shutdown-status')]"
+          },
+          "shutdownHour": {
+            "value": "[variables('shutdownHour')]"
+          },
+          "shutdown-timeZone": {
+            "value": "[parameters('shutdown-timeZone')]"
+          },
+          "imageReference": {
+            "value": "[variables('imageReference')]"
+          },
+          "storageContainerUri": {
+            "value": "[variables('storageContainerUri')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          }
+        }
+      }
+    },
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "[variables('lbname')]",
@@ -354,7 +423,8 @@
       "dependsOn": [
         "[variables('lbname')]",
         "[variables('storageaccount')]",
-        "[variables('vnetName')]"
+        "[variables('vnetName')]",
+        "[variables('deployDC')]"
       ],
       "properties": {
         "mode": "Incremental",
