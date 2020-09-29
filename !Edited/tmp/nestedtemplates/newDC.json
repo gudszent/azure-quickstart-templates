@@ -299,7 +299,7 @@
                 },
                 "parameters": {
                     "virtualNetworkName": {
-                        "value": "[concat(parameters('virtualMachineName'),'-NET')]"
+                        "value": "[concat(parameters('virtualMachineName'),'-Vnet')]"
                     },
                     "virtualNetworkAddressRange": {
                         "value": "[parameters('virtualNetworkAddressRange')]"
