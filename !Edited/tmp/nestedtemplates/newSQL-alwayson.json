@@ -178,7 +178,7 @@
             "apiVersion": "2015-01-01",
             "name": "[concat(parameters('vmName'),'-0-clusterIp')]",
             "dependsOn": [
-                "nicLoop"
+                "[parameters('vmName')]"
             ],
             "properties": {
                 "mode": "Incremental",
