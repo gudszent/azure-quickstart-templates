@@ -1,0 +1,176 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "lbname": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "deployLBTemplateURL": {
+            "type": "string"
+        },
+        "lbbackend": {
+            "type": "string"
+        },
+        "vmName": {
+            "type": "string"
+        },
+        "deployVMTemplateURL": {
+            "type": "string"
+        },
+        "domainName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
+        },
+        "shutdown-status": {
+            "type": "string"
+        },
+        "shutdownHour": {
+            "type": "string"
+        },
+        "shutdown-timeZone": {
+            "type": "string"
+        },
+        "imageReference": {
+            "type": "object"
+        },
+        "numberOfInstances": {
+            "type": "int"
+        },
+        "vmSize": {
+            "type": "string"
+        },
+        "ouPath": {
+            "type": "string"
+        },
+        "storageContainerUri": {
+            "type": "string"
+        },
+        "vmavailabilityset": {
+            "type": "string"
+        },
+        "_artifactsLocation": {
+            "type": "string"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "string"
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[parameters('lbname')]",
+            "dependsOn": [
+                "[parameters('vnetName')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('deployLBTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "lbname": {
+                        "value": "[parameters('lbname')]"
+                    },
+                    "lbbackend": {
+                        "value": "[parameters('lbbackend')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[parameters('vmName')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[parameters('lbname')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('deployVMTemplateURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "virtualMachineName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "domainName": {
+                        "value": "[parameters('domainName')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('subnetName')]"
+                    },
+                    "shutdown-status": {
+                        "value": "[parameters('shutdown-status')]"
+                    },
+                    "shutdownHour": {
+                        "value": "[parameters('shutdownHour')]"
+                    },
+                    "shutdown-timeZone": {
+                        "value": "[parameters('shutdown-timeZone')]"
+                    },
+                    "imageReference": {
+                        "value": "[parameters('imageReference')]"
+                    },
+                    "numberOfInstances": {
+                        "value": "[parameters('numberOfInstances')]"
+                    },
+                    "vmSize": {
+                        "value": "[parameters('vmSize')]"
+                    },
+                    "ouPath": {
+                        "value": "[parameters('ouPath')]"
+                    },
+                    "storageContainerUri": {
+                        "value": "[parameters('storageContainerUri')]"
+                    },
+                    "vmavailabilityset": {
+                        "value": "[parameters('vmavailabilityset')]"
+                    },
+                    "lbname": {
+                        "value": "[parameters('lbname')]"
+                    },
+                    "lbbackend": {
+                        "value": "[parameters('lbbackend')]"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        }
+
+    ],
+    "outputs": {}
+}
