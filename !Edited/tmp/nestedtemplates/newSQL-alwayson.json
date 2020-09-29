@@ -122,6 +122,9 @@
                     "adminPassword": {
                         "value": "[parameters('adminPassword')]"
                     },
+                    "vnetName": {
+                        "value": "[parameters('vnetName')]"
+                    },
                     "subnetName": {
                         "value": "[parameters('subnetName')]"
                     },

@@ -31,6 +31,10 @@
                 "description": "Subnet name."
             }
         },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": ""
+        },
         "shutdown-status": {
             "type": "string",
             "allowedValues": [
@@ -175,7 +179,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('virtualMachineName'),'-VNet'), parameters('subnetName'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
                             },
                             "publicIpAddress": {
                                 "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-', copyIndex(),'-publicIP'))]"
