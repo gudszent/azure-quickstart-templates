@@ -211,10 +211,10 @@
                 },
                 "parameters": {
                     "ipConfig": {
-                        "value": "[reference(concat(parameters('vmName'),'-', copyIndex(1), '-nic')).ipConfigurations[1].properties.privateIPAddress]"
+                        "value": "[resourceId('/Microsoft.Network/networkInterfaces/',concat(parameters('vmName'),'-', copyIndex(1), '-nic')).ipConfigurations[1].properties.privateIPAddress]"
                     },
                     "ipAddresses": {
-                        "value": "[reference(concat(parameters('vmName'),'-',copyIndex(1),'-clusterIp')).outputs.result.value]"
+                        "value": "[resourceId('/Microsoft.Network/networkInterfaces/',concat(parameters('vmName'),'-',copyIndex(1),'-clusterIp')).outputs.result.value]"
                     }
                 }
             }
