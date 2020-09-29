@@ -283,7 +283,8 @@
     "deployLBTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/NewVmLB.json', parameters('_artifactsLocationSasToken')))]",
     "lbname": "[concat(parameters('virtualMachineName'),'-lbname')]",
     "lbbackend": "[concat(variables('lbname'),'-backend')]",
-    "sqlvmname": "[concat(parameters('virtualMachineName'),'-sql')]"
+    "sqlvmname": "[concat(parameters('virtualMachineName'),'-sql')]",
+    "ipLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/getIpAddress.json',parameters('_artifactsLocationSasToken'))]"
   },
   "resources": [
     {
