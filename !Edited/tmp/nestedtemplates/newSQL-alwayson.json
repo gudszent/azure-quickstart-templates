@@ -201,7 +201,7 @@
             },
             "name": "[concat(parameters('vmName'),'-',copyIndex(1),'-clusterIp')]",
             "dependsOn": [
-               "[parameters('vmName')]",
+                "[parameters('vmName')]",
                 "[concat(parameters('vmName'),'-0-clusterIp')]"
             ],
             "properties": {
