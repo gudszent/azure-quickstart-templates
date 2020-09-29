@@ -59,6 +59,9 @@
                 "description": "Subnet IP range."
             }
         },
+        "vnetName": {
+            "type": "string"
+        },
         "shutdown-status": {
             "type": "string",
             "allowedValues": [
@@ -299,7 +302,7 @@
                 },
                 "parameters": {
                     "virtualNetworkName": {
-                        "value": "[concat(parameters('virtualMachineName'),'-Vnet')]"
+                        "value": "[parameters('vnetName')]"
                     },
                     "virtualNetworkAddressRange": {
                         "value": "[parameters('virtualNetworkAddressRange')]"

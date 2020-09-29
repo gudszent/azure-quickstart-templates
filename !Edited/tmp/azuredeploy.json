@@ -357,6 +357,9 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
+          "vnetName":{
+            "value": "[variables('vnetName')]"
+          },
           "virtualNetworkAddressRange": {
             "value": "[parameters('virtualNetworkAddressRange')]"
           },
