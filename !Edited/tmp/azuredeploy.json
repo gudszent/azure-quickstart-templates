@@ -279,9 +279,11 @@
     "storageContainerUri": "[concat(concat('https://', concat(parameters('virtualMachineName'),'sa'), '.blob.core.windows.net/'), 'vhds/')]",
     "deployDC": "[concat(parameters('virtualMachineName'),'-DeployDC')]",
     "vmavailabilityset": "[concat(parameters('virtualMachineName'),'-vmavailabilityset')]",
+    "sqlvmavailabilityset": "[concat(parameters('virtualMachineName'),'-sqlvmavailabilityset')]",
     "deployLBTemplateURL": "[uri(parameters('_artifactsLocation'),concat('nestedtemplates/NewVmLB.json', parameters('_artifactsLocationSasToken')))]",
     "lbname": "[concat(parameters('virtualMachineName'),'-lbname')]",
-    "lbbackend": "[concat(variables('lbname'),'-backend')]"
+    "lbbackend": "[concat(variables('lbname'),'-backend')]",
+    "sqlvmname": "[concat(parameters('virtualMachineName'),'-sql')]"
   },
   "resources": [
     {
@@ -413,70 +415,70 @@
         },
         "parameters": {
           "lbname": {
-            "type": "string"
+            "value": "[variables('lbname')]"
           },
           "vnetName": {
-            "type": "string"
+            "value": "[variables('vnetName')]"
           },
           "deployLBTemplateURL": {
-            "type": "string"
+            "value": "[variables('deployLBTemplateURL')]"
           },
           "lbbackend": {
-            "type": "string"
+            "value": "[variables('lbbackend')]"
           },
           "vmName": {
-            "type": "string"
+            "value": "[variables('sqlvmname')]"
           },
           "deployVMTemplateURL": {
-            "type": "string"
+            "value": "[variables('deployVMTemplateURL')]"
           },
           "domainName": {
-            "type": "string"
+            "value": "[parameters('domainName')]"
           },
           "location": {
-            "type": "string"
+            "value": "[parameters('location')]"
           },
           "adminUsername": {
-            "type": "string"
+            "value": "[parameters('adminUsername')]"
           },
           "adminPassword": {
-            "type": "string"
+            "value": "[parameters('adminPassword')]"
           },
           "subnetName": {
-            "type": "string"
+            "value": "[parameters('subnetName')]"
           },
           "shutdown-status": {
-            "type": "string"
+            "value": "[parameters('shutdown-status')]"
           },
           "shutdownHour": {
-            "type": "string"
+            "value": "[variables('shutdownHour')]"
           },
           "shutdown-timeZone": {
-            "type": "string"
+            "value": "[parameters('shutdown-timeZone')]"
           },
           "imageReference": {
-            "type": "object"
+            "value": "[variables('imageReference')]"
           },
           "numberOfInstances": {
-            "type": "int"
+            "value": "[parameters('sqlvmCount')]"
           },
           "vmSize": {
-            "type": "string"
+            "value": "[parameters('sqlvmSize')]"
           },
           "ouPath": {
-            "type": "string"
+            "value": "[parameters('ouPath')]"
           },
           "storageContainerUri": {
-            "type": "string"
+            "value": "[variables('storageContainerUri')]"
           },
           "vmavailabilityset": {
-            "type": "string"
+            "value": "[variables('sqlvmavailabilityset')]"
           },
           "_artifactsLocation": {
-            "type": "string"
+            "value": "[parameters('_artifactsLocation')]"
           },
           "_artifactsLocationSasToken": {
-            "type": "string"
+            "value": "[parameters('_artifactsLocationSasToken')]"
           }
         }
       }
